@@ -1,0 +1,37 @@
+[build-system]
+requires      = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wisardlib"
+version = "0.0.1"
+description = "The wisard RAM-net based model"
+readme = "README.md"
+authors = [{name = "Otavio Napoli", email = "otavio.napoli@gmail.com"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3"
+]
+keywords = ["wisard", "ramnet", "machine learning"]
+dependencies = [
+    "numba >= 0.56",
+    "numpy",
+    "scikit-learn",
+    "tqdm",
+    "pyprobables"
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "pytest",
+    "ipython"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/otavioon/wisard"
+"Bug Tracker" = "https://github.com/otavioon/wisard/issues"
