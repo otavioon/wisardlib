@@ -1,0 +1,22 @@
+:py:mod:`wisardlib.builder`
+===========================
+
+.. py:module:: wisardlib.builder
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.builder.build_symmetric_wisard
+
+
+
+.. py:function:: build_symmetric_wisard(RAM_cls, number_of_rams_per_discriminator, number_of_discriminators, indices, tuple_size, RAM_creation_kwargs = None, shuffle_indices = True, count_responses = True)
+
+

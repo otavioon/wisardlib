@@ -1,0 +1,14 @@
+:py:mod:`wisardlib.config.type_definitions`
+===========================================
+
+.. py:module:: wisardlib.config.type_definitions
+
+
+Module Contents
+---------------
+
+.. py:data:: BooleanArray
+   
+
+   
+

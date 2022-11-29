@@ -1,0 +1,15 @@
+:py:mod:`wisardlib.config`
+==========================
+
+.. py:module:: wisardlib.config
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   type_definitions/index.rst
+
+

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wisardlib.wisard &mdash; wisardlib 0.0.1-dev documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wisardlib
+          </a>
+              <div class="version">
+                0.0.1-dev
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Programming Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wisardlib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">wisardlib.wisard</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for wisardlib.wisard</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Real</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">wisardlib.config.type_definitions</span> <span class="kn">import</span> <span class="n">BooleanArray</span>
+<span class="kn">from</span> <span class="nn">wisardlib.rams.base</span> <span class="kn">import</span> <span class="n">RAM</span>
+
+
+<div class="viewcode-block" id="Discriminator"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator">[docs]</a><span class="k">class</span> <span class="nc">Discriminator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A set of Random Access Memory for a single class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rams : List[RAM]</span>
+<span class="sd">        List of Random Access Memories</span>
+<span class="sd">    bleach : Real | List[Real]</span>
+<span class="sd">        The bleach value (the default is 1).</span>
+<span class="sd">        - If the value is a Real number, the bleach will the same to all RAMs</span>
+<span class="sd">        - If it is a list of Real, the bleach value will be applyied to each RAM.</span>
+<span class="sd">    count_responses : bool</span>
+<span class="sd">        if true, count responses higher than bleach, else, return the responses</span>
+<span class="sd">        (the default is True).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RAM</span><span class="p">],</span>
+        <span class="n">bleach</span><span class="p">:</span> <span class="n">Real</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">count_responses</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RAM</span><span class="p">]</span> <span class="o">=</span> <span class="n">rams</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_count_responses</span> <span class="o">=</span> <span class="n">count_responses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bleach</span> <span class="o">=</span> <span class="n">bleach</span>
+
+<div class="viewcode-block" id="Discriminator.fit"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BooleanArray</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit model based on the input.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : List[BooleanArray]</span>
+<span class="sd">            List of addresses. Each address will be addressed to each RAM.</span>
+<span class="sd">        y : type</span>
+<span class="sd">            Not used. Each discriminator is used for a single class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Discriminator</span>
+<span class="sd">            The self object.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the number of RAMs is different from the number of input addresses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Do checking</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;X must have same length as number of RAMs&quot;</span><span class="p">)</span>
+        <span class="c1"># Add member of each input to the respective RAM</span>
+        <span class="k">for</span> <span class="n">ram</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+            <span class="n">ram</span><span class="o">.</span><span class="n">add_member</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Discriminator.predict"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BooleanArray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Make predictions for each sample.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : List[BooleanArray]</span>
+<span class="sd">            List of addresses. Each address will be checked against each RAM.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            The array with the scores for each class. If `_count_responses` is</span>
+<span class="sd">            True, it will be returned it will be returned the number of times</span>
+<span class="sd">            that each input response is greater than bleach. Else, it will be</span>
+<span class="sd">            returned the sum of responses (frequency of the address) that is</span>
+<span class="sd">            higher than bleach.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the number of RAMs is different from the number of input addresses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Do checking</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;X must have same length as number of RAMs&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If bleach is a number, it will be the same for all RAMs</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+            <span class="n">bleach_vals</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+        <span class="c1"># Else: one singular bleach value to one RAMs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bleach_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span>
+
+        <span class="c1"># If True, count the number of times each response if higher than</span>
+        <span class="c1"># respective RAM&#39;s bleach</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_responses</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">ram</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">bleach</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ram</span><span class="p">,</span> <span class="n">bleach</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">,</span> <span class="n">bleach_vals</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># Else, return the sum of responses of responses higher than respective</span>
+        <span class="c1"># RAM&#39;s bleach</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="mi">0</span> <span class="k">if</span> <span class="n">ram</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bleach</span> <span class="k">else</span> <span class="n">ram</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">ram</span><span class="p">,</span> <span class="n">bleach</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">,</span> <span class="n">bleach_vals</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+        <span class="c1"># for ram, bleach, x in zip(self._rams, bleach_vals, X):</span>
+        <span class="c1">#     value = ram[x]</span>
+        <span class="c1">#     if self._count_responses:</span>
+        <span class="c1">#         response += int(value &gt;= bleach)</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         response += 0 if value &lt; bleach else value</span>
+        <span class="c1"># return response</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bleach</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Bleach getter.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Real | List[Real]</span>
+<span class="sd">            The bleach value.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span>
+
+    <span class="nd">@bleach</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bleach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Real</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Bleach setter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : Real | List[Real]</span>
+<span class="sd">            If bleach is Real, the same bleach value will be applyied to each</span>
+<span class="sd">            RAM. Else, one specific bleach will be applyied to each RAM.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a list of bleaches is passed with different number of RAMs.</span>
+
+<span class="sd">        TypeError</span>
+<span class="sd">            If the `value` passed is not a Real number nor a list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of bleach must be the same as number of RAMS&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bleach</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Bleach must be a list of real numbers or real number&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Discriminator.__getitem__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RAM</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a single RAM with python&#39;s subscribed operator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : int | slice</span>
+<span class="sd">            The key to be get.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RAM</span>
+<span class="sd">            The RAMs gathered.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Discriminator.__str__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Discriminator with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">)</span><span class="si">}</span><span class="s2"> RAMS&quot;</span></div>
+
+<div class="viewcode-block" id="Discriminator.__repr__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Discriminator.__len__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.Discriminator.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rams</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WiSARD"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD">[docs]</a><span class="k">class</span> <span class="nc">WiSARD</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Short summary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    discriminators : List[Discriminator]</span>
+<span class="sd">        A list of RAM-discriminators. One for each desired class.</span>
+<span class="sd">    indices : List[int]</span>
+<span class="sd">        The list of indices that will be selected by each tuple.</span>
+<span class="sd">    tuple_size : int | List[int] | List[slice]</span>
+<span class="sd">        Size of each tuple. For each RAM, `tuple_size` indices will be</span>
+<span class="sd">        selected from `indices`, consecutively.</span>
+<span class="sd">        The type can be:</span>
+<span class="sd">        - An non-negative integer: the tuples of same size will be consecutively</span>
+<span class="sd">            be selected from `indices`. For instance, if `tuple_size` == 3, then</span>
+<span class="sd">            for each RAM, the following indices will be selected:</span>
+<span class="sd">            [0 .. `tuple_size`, `tuple_size+1`..2*`tuple_size`, ...]</span>
+<span class="sd">        - An list of integer: the indices will of each element will be:</span>
+<span class="sd">            0..sum(tuple_size[:1]), sum(tuple_size[:1])..sum(tuple_size[:2]), ...</span>
+<span class="sd">        - An list of 2-element lists. Each element is the start and end of the</span>
+<span class="sd">            range of the `indices`.</span>
+<span class="sd">        **NOTE**: `data[selected_indices] == RAM address`</span>
+<span class="sd">        **NOTE**: The sum of `tuple_size` (if a list) must be equals `indices` length.</span>
+<span class="sd">    shuffle_indices : bool</span>
+<span class="sd">        Shuffle indices before selecting composing an address (the default is False).</span>
+<span class="sd">    use_tqdm : bool</span>
+<span class="sd">        Use tqdm progress bar (the default is True).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">discriminators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Discriminator</span><span class="p">],</span>
+        <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">tuple_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">slice</span><span class="p">],</span>
+        <span class="n">shuffle_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_tqdm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">discriminators</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">),</span> <span class="s2">&quot;Must be a list of discriminators&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">),</span> <span class="s2">&quot;Must be a list of indices&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Discriminator</span><span class="p">]</span> <span class="o">=</span> <span class="n">discriminators</span>
+        <span class="n">_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">shuffle_indices</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">_indices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">slice</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_indices</span><span class="p">(</span><span class="n">_indices</span><span class="p">,</span> <span class="n">tuple_size</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span>
+            <span class="p">),</span> <span class="s2">&quot;Number of RAMS per discriminator must be greater or equal the number of addresses&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_tqdm</span> <span class="o">=</span> <span class="n">use_tqdm</span>
+
+<div class="viewcode-block" id="WiSARD._calculate_indices"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD._calculate_indices">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_indices</span><span class="p">(</span>
+        <span class="n">indices</span><span class="p">,</span> <span class="n">tuple_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">slice</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">slice</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the slice of `indices` thatwill be use for input to be</span>
+<span class="sd">        used in each RAM.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        indices : List[int]</span>
+<span class="sd">            List of indices.</span>
+<span class="sd">        tuple_size : int | List[int] | List[slice]</span>
+<span class="sd">            The `tuple_size` or slices.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[slice]</span>
+<span class="sd">            List of slices to be used in the input data to get an address.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tuple_size</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tuple_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="c1"># Allows overlap by specifying slices manually</span>
+                <span class="n">_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">_indices</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tuple_size</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tuple_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">tuple_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">tuple_size</span><span class="p">]</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">must_stop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">must_stop</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">tuple_size</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+                    <span class="n">must_stop</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+                <span class="n">slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">start</span> <span class="o">+=</span> <span class="n">size</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="WiSARD.__getitem__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the discriminator using the subscribed operator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bleach</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]]</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get the bleach of each discriminator.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[List[Real]] | List[Real]</span>
+<span class="sd">            A list of bleach defined for each discriminator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">bleach</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">]</span>
+
+    <span class="nd">@bleach</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bleach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Real</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Real</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Set the same bleach value to all discriminators.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : Real | List[Real]</span>
+<span class="sd">            The bleach value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">bleach</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get calculated indices.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span>
+
+<div class="viewcode-block" id="WiSARD._reindex_sample"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD._reindex_sample">[docs]</a>    <span class="k">def</span> <span class="nf">_reindex_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">BooleanArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BooleanArray</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Given a numpy array as input, create a list of subsamples acessing</span>
+<span class="sd">        the input at each indices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : np.ndarray</span>
+<span class="sd">            The input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[np.ndarray]</span>
+<span class="sd">            List of sub-arrays, each for respective subset of indices.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExceptionName</span>
+<span class="sd">            Why the exception is raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="WiSARD.fit"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">BooleanArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit the model over given input samples.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : BooleanArray</span>
+<span class="sd">            An array of samples.</span>
+<span class="sd">        y : np.ndarray</span>
+<span class="sd">            Each respective sample class (it will be indexed as the discriminator)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        WiSARD</span>
+<span class="sd">            The self object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+        <span class="c1"># If use tqdm, create an tqdm iterator at each sample</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tqdm</span><span class="p">:</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">it</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">leave</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Fitting model...&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Iterate over inputs</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+            <span class="c1"># Transform each input as a list of subsamples (based on indices)</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reindex_sample</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">[</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="WiSARD.predict"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">BooleanArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Predict the score of each sample per discriminator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : BooleanArray</span>
+<span class="sd">            An array of samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -----------</span>
+<span class="sd">        np.ndarray (an matrix)</span>
+<span class="sd">            A matrix where each row has the scores (responses from discriminators)</span>
+<span class="sd">            for each sample of X. Each row is a vector where each column is the</span>
+<span class="sd">            score (response) given by a discriminator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+        <span class="c1"># Iterate over each sample from X</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tqdm</span><span class="p">:</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">it</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">leave</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Predicting   ...&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># List with the responses of each disriminator per sample</span>
+        <span class="n">y_pred</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#Iterate over samples</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+            <span class="c1"># Reindex the input according to indices</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reindex_sample</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="c1"># Calculate the response for each discriminator</span>
+            <span class="n">responses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">])</span>
+            <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span>  <span class="c1"># np.where(responses == responses.max())[0])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WiSARD.__str__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;WiSARD with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_discriminators</span><span class="p">)</span><span class="si">}</span><span class="s2"> discriminators.&quot;</span></div>
+
+<div class="viewcode-block" id="WiSARD.__repr__"><a class="viewcode-back" href="../../autoapi/wisardlib/wisard/index.html#wisardlib.wisard.WiSARD.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Otavio Napoli.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

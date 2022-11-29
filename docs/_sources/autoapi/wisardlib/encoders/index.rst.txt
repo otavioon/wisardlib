@@ -1,0 +1,16 @@
+:py:mod:`wisardlib.encoders`
+============================
+
+.. py:module:: wisardlib.encoders
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   base/index.rst
+   thermometer/index.rst
+
+

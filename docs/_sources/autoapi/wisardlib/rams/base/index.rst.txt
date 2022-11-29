@@ -1,0 +1,36 @@
+:py:mod:`wisardlib.rams.base`
+=============================
+
+.. py:module:: wisardlib.rams.base
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.rams.base.RAM
+
+
+
+
+.. py:class:: RAM
+
+   Random access memory implementation.
+
+   .. py:method:: __contains__(key)
+      :abstractmethod:
+
+
+   .. py:method:: __getitem__(key)
+      :abstractmethod:
+
+
+   .. py:method:: add_member(key, inc_val = 1)
+      :abstractmethod:
+
+
+

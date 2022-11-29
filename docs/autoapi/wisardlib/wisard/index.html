@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wisardlib.wisard &mdash; wisardlib 0.0.1-dev documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="prev" title="wisardlib.utils" href="../utils/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> wisardlib
+          </a>
+              <div class="version">
+                0.0.1-dev
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../api.html">Programming Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib</span></code></a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../index.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../builder/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib.builder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib.utils</span></code></a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib.wisard</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">wisardlib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../api.html">Programming Reference</a></li>
+          <li class="breadcrumb-item"><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib</span></code></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib.wisard</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/wisardlib/wisard/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-wisardlib.wisard">
+<span id="wisardlib-wisard"></span><h1><a class="reference internal" href="#module-wisardlib.wisard" title="wisardlib.wisard"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wisardlib.wisard</span></code></a><a class="headerlink" href="#module-wisardlib.wisard" title="Permalink to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wisardlib.wisard.Discriminator" title="wisardlib.wisard.Discriminator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Discriminator</span></code></a></p></td>
+<td><p>A set of Random Access Memory for a single class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#wisardlib.wisard.WiSARD" title="wisardlib.wisard.WiSARD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WiSARD</span></code></a></p></td>
+<td><p>Short summary.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wisardlib.wisard.</span></span><span class="sig-name descname"><span class="pre">Discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bleach</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_responses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator" title="Permalink to this definition"></a></dt>
+<dd><p>A set of Random Access Memory for a single class.</p>
+<section id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>rams<span class="classifier">List[RAM]</span></dt><dd><p>List of Random Access Memories</p>
+</dd>
+<dt>bleach<span class="classifier">Real | List[Real]</span></dt><dd><p>The bleach value (the default is 1).
+- If the value is a Real number, the bleach will the same to all RAMs
+- If it is a list of Real, the bleach value will be applyied to each RAM.</p>
+</dd>
+<dt>count_responses<span class="classifier">bool</span></dt><dd><p>if true, count responses higher than bleach, else, return the responses
+(the default is True).</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.bleach">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bleach</span></span><a class="headerlink" href="#wisardlib.wisard.Discriminator.bleach" title="Permalink to this definition"></a></dt>
+<dd><p>Bleach getter.</p>
+<section id="returns">
+<h5>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>Real | List[Real]</dt><dd><p>The bleach value.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Get a single RAM with python’s subscribed operator.</p>
+<section id="id1">
+<h5>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>key<span class="classifier">int | slice</span></dt><dd><p>The key to be get.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h5>Returns<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>RAM</dt><dd><p>The RAMs gathered.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../rams/base/index.html#wisardlib.rams.base.RAM" title="wisardlib.rams.base.RAM">wisardlib.rams.base.RAM</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator.__len__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator.__str__" title="Permalink to this definition"></a></dt>
+<dd><p>Return str(self).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit model based on the input.</p>
+<section id="id3">
+<h5>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>X<span class="classifier">List[BooleanArray]</span></dt><dd><p>List of addresses. Each address will be addressed to each RAM.</p>
+</dd>
+<dt>y<span class="classifier">type</span></dt><dd><p>Not used. Each discriminator is used for a single class.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h5>Returns<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>Discriminator</dt><dd><p>The self object.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h5>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the number of RAMs is different from the number of input addresses.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>List</em><em>[</em><em>wisardlib.config.type_definitions.BooleanArray</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.Discriminator.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#Discriminator.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.Discriminator.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Make predictions for each sample.</p>
+<section id="id5">
+<h5>Parameters<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>X<span class="classifier">List[BooleanArray]</span></dt><dd><p>List of addresses. Each address will be checked against each RAM.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h5>Returns<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>np.ndarray</dt><dd><p>The array with the scores for each class. If <cite>_count_responses</cite> is
+True, it will be returned it will be returned the number of times
+that each input response is greater than bleach. Else, it will be
+returned the sum of responses (frequency of the address) that is
+higher than bleach.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h5>Raises<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the number of RAMs is different from the number of input addresses.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>List</em><em>[</em><em>wisardlib.config.type_definitions.BooleanArray</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rams</strong> (<em>List</em><em>[</em><a class="reference internal" href="../rams/base/index.html#wisardlib.rams.base.RAM" title="wisardlib.rams.base.RAM"><em>wisardlib.rams.base.RAM</em></a><em>]</em>) – </p></li>
+<li><p><strong>bleach</strong> (<em>Real</em><em> | </em><em>List</em><em>[</em><em>Real</em><em>]</em>) – </p></li>
+<li><p><strong>count_responses</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wisardlib.wisard.</span></span><span class="sig-name descname"><span class="pre">WiSARD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discriminators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuple_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tqdm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD" title="Permalink to this definition"></a></dt>
+<dd><p>Short summary.</p>
+<section id="id8">
+<h4>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h4>
+<dl>
+<dt>discriminators<span class="classifier">List[Discriminator]</span></dt><dd><p>A list of RAM-discriminators. One for each desired class.</p>
+</dd>
+<dt>indices<span class="classifier">List[int]</span></dt><dd><p>The list of indices that will be selected by each tuple.</p>
+</dd>
+<dt>tuple_size<span class="classifier">int | List[int] | List[slice]</span></dt><dd><p>Size of each tuple. For each RAM, <cite>tuple_size</cite> indices will be
+selected from <cite>indices</cite>, consecutively.
+The type can be:
+- An non-negative integer: the tuples of same size will be consecutively</p>
+<blockquote>
+<div><p>be selected from <cite>indices</cite>. For instance, if <cite>tuple_size</cite> == 3, then
+for each RAM, the following indices will be selected:
+[0 .. <cite>tuple_size</cite>, <cite>tuple_size+1</cite>..2*`tuple_size`, …]</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>An list of integer: the indices will of each element will be:</dt><dd><p>0..sum(tuple_size[:1]), sum(tuple_size[:1])..sum(tuple_size[:2]), …</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>An list of 2-element lists. Each element is the start and end of the</dt><dd><p>range of the <cite>indices</cite>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>NOTE</strong>: <cite>data[selected_indices] == RAM address</cite>
+<strong>NOTE</strong>: The sum of <cite>tuple_size</cite> (if a list) must be equals <cite>indices</cite> length.</p>
+</dd>
+<dt>shuffle_indices<span class="classifier">bool</span></dt><dd><p>Shuffle indices before selecting composing an address (the default is False).</p>
+</dd>
+<dt>use_tqdm<span class="classifier">bool</span></dt><dd><p>Use tqdm progress bar (the default is True).</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.bleach">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bleach</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Real</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Real</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#wisardlib.wisard.WiSARD.bleach" title="Permalink to this definition"></a></dt>
+<dd><p>Get the bleach of each discriminator.</p>
+<section id="id9">
+<h5>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>List[List[Real]] | List[Real]</dt><dd><p>A list of bleach defined for each discriminator.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[List[Real]] | List[Real]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indices</span></span><a class="headerlink" href="#wisardlib.wisard.WiSARD.indices" title="Permalink to this definition"></a></dt>
+<dd><p>Get calculated indices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Get the discriminator using the subscribed operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD.__str__" title="Permalink to this definition"></a></dt>
+<dd><p>Return str(self).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD._calculate_indices">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuple_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD._calculate_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD._calculate_indices" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the slice of <cite>indices</cite> thatwill be use for input to be
+used in each RAM.</p>
+<section id="id10">
+<h5>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>indices<span class="classifier">List[int]</span></dt><dd><p>List of indices.</p>
+</dd>
+<dt>tuple_size<span class="classifier">int | List[int] | List[slice]</span></dt><dd><p>The <cite>tuple_size</cite> or slices.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h5>Returns<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>List[slice]</dt><dd><p>List of slices to be used in the input data to get an address.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tuple_size</strong> (<em>int</em><em> | </em><em>List</em><em>[</em><em>int</em><em>] </em><em>| </em><em>List</em><em>[</em><em>slice</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>List[slice]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD._reindex_sample">
+<span class="sig-name descname"><span class="pre">_reindex_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD._reindex_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD._reindex_sample" title="Permalink to this definition"></a></dt>
+<dd><p>Given a numpy array as input, create a list of subsamples acessing
+the input at each indices.</p>
+<section id="id12">
+<h5>Parameters<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>x<span class="classifier">np.ndarray</span></dt><dd><p>The input.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h5>Returns<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>List[np.ndarray]</dt><dd><p>List of sub-arrays, each for respective subset of indices.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h5>Raises<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>ExceptionName</dt><dd><p>Why the exception is raised.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>wisardlib.config.type_definitions.BooleanArray</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>List[wisardlib.config.type_definitions.BooleanArray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model over given input samples.</p>
+<section id="id15">
+<h5>Parameters<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>X<span class="classifier">BooleanArray</span></dt><dd><p>An array of samples.</p>
+</dd>
+<dt>y<span class="classifier">np.ndarray</span></dt><dd><p>Each respective sample class (it will be indexed as the discriminator)</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h5>Returns<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>WiSARD</dt><dd><p>The self object.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>wisardlib.config.type_definitions.BooleanArray</em>) – </p></li>
+<li><p><strong>y</strong> (<em>numpy.ndarray</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wisardlib.wisard.WiSARD.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/wisardlib/wisard.html#WiSARD.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wisardlib.wisard.WiSARD.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict the score of each sample per discriminator.</p>
+<section id="id17">
+<h5>Parameters<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>X<span class="classifier">BooleanArray</span></dt><dd><p>An array of samples.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h5>Returns<a class="headerlink" href="#id18" title="Permalink to this heading"></a></h5>
+<dl class="simple">
+<dt>np.ndarray (an matrix)</dt><dd><p>A matrix where each row has the scores (responses from discriminators)
+for each sample of X. Each row is a vector where each column is the
+score (response) given by a discriminator.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>wisardlib.config.type_definitions.BooleanArray</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>discriminators</strong> (<em>List</em><em>[</em><a class="reference internal" href="#wisardlib.wisard.Discriminator" title="wisardlib.wisard.Discriminator"><em>Discriminator</em></a><em>]</em>) – </p></li>
+<li><p><strong>indices</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>tuple_size</strong> (<em>int</em><em> | </em><em>List</em><em>[</em><em>int</em><em>] </em><em>| </em><em>List</em><em>[</em><em>slice</em><em>]</em>) – </p></li>
+<li><p><strong>shuffle_indices</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>use_tqdm</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../utils/index.html" class="btn btn-neutral float-left" title="wisardlib.utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Otavio Napoli.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

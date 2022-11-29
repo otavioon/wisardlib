@@ -1,0 +1,57 @@
+:py:mod:`wisardlib.encoders.thermometer`
+========================================
+
+.. py:module:: wisardlib.encoders.thermometer
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.encoders.thermometer.NestedThermometerEncoder
+   wisardlib.encoders.thermometer.ThermometerEncoder
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.encoders.thermometer.int_to_binary_list
+
+
+
+.. py:class:: NestedThermometerEncoder(resolution, resolution_2)
+
+   Bases: :py:obj:`wisardlib.encoders.base.Encoder`
+
+   Encode a numpy array into a array of booleans.
+
+   .. py:method:: fit(X, y=None, **fit_args)
+
+
+   .. py:method:: transform(X)
+
+
+
+.. py:class:: ThermometerEncoder(resolution)
+
+   Bases: :py:obj:`wisardlib.encoders.base.Encoder`
+
+   Encode a numpy array into a array of booleans.
+
+   .. py:method:: fit(X, y=None, **fit_args)
+
+
+   .. py:method:: transform(X)
+
+
+
+.. py:function:: int_to_binary_list(value, size, reverse = False)
+
+

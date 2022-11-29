@@ -1,0 +1,270 @@
+:py:mod:`wisardlib.wisard`
+==========================
+
+.. py:module:: wisardlib.wisard
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.wisard.Discriminator
+   wisardlib.wisard.WiSARD
+
+
+
+
+.. py:class:: Discriminator(rams, bleach = 1, count_responses = True)
+
+   A set of Random Access Memory for a single class.
+
+   Parameters
+   ----------
+   rams : List[RAM]
+       List of Random Access Memories
+   bleach : Real | List[Real]
+       The bleach value (the default is 1).
+       - If the value is a Real number, the bleach will the same to all RAMs
+       - If it is a list of Real, the bleach value will be applyied to each RAM.
+   count_responses : bool
+       if true, count responses higher than bleach, else, return the responses
+       (the default is True).
+
+   .. py:property:: bleach
+
+      Bleach getter.
+
+      Returns
+      -------
+      Real | List[Real]
+          The bleach value.
+
+
+
+   .. py:method:: __getitem__(key)
+
+      Get a single RAM with python's subscribed operator.
+
+      Parameters
+      ----------
+      key : int | slice
+          The key to be get.
+
+      Returns
+      -------
+      RAM
+          The RAMs gathered.
+
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: fit(X, y=None)
+
+      Fit model based on the input.
+
+      Parameters
+      ----------
+      X : List[BooleanArray]
+          List of addresses. Each address will be addressed to each RAM.
+      y : type
+          Not used. Each discriminator is used for a single class.
+
+      Returns
+      -------
+      Discriminator
+          The self object.
+
+      Raises
+      ------
+      ValueError
+          If the number of RAMs is different from the number of input addresses.
+
+
+
+   .. py:method:: predict(X)
+
+      Make predictions for each sample.
+
+      Parameters
+      ----------
+      X : List[BooleanArray]
+          List of addresses. Each address will be checked against each RAM.
+
+      Returns
+      -------
+      np.ndarray
+          The array with the scores for each class. If `_count_responses` is
+          True, it will be returned it will be returned the number of times
+          that each input response is greater than bleach. Else, it will be
+          returned the sum of responses (frequency of the address) that is
+          higher than bleach.
+
+      Raises
+      ------
+      ValueError
+          If the number of RAMs is different from the number of input addresses.
+
+
+
+
+.. py:class:: WiSARD(discriminators, indices, tuple_size, shuffle_indices = False, use_tqdm = True)
+
+   Short summary.
+
+   Parameters
+   ----------
+   discriminators : List[Discriminator]
+       A list of RAM-discriminators. One for each desired class.
+   indices : List[int]
+       The list of indices that will be selected by each tuple.
+   tuple_size : int | List[int] | List[slice]
+       Size of each tuple. For each RAM, `tuple_size` indices will be
+       selected from `indices`, consecutively.
+       The type can be:
+       - An non-negative integer: the tuples of same size will be consecutively
+           be selected from `indices`. For instance, if `tuple_size` == 3, then
+           for each RAM, the following indices will be selected:
+           [0 .. `tuple_size`, `tuple_size+1`..2*`tuple_size`, ...]
+       - An list of integer: the indices will of each element will be:
+           0..sum(tuple_size[:1]), sum(tuple_size[:1])..sum(tuple_size[:2]), ...
+       - An list of 2-element lists. Each element is the start and end of the
+           range of the `indices`.
+       **NOTE**: `data[selected_indices] == RAM address`
+       **NOTE**: The sum of `tuple_size` (if a list) must be equals `indices` length.
+   shuffle_indices : bool
+       Shuffle indices before selecting composing an address (the default is False).
+   use_tqdm : bool
+       Use tqdm progress bar (the default is True).
+
+
+   .. py:property:: bleach
+      :type: List[List[Real]] | List[Real]
+
+      Get the bleach of each discriminator.
+
+      Returns
+      -------
+      List[List[Real]] | List[Real]
+          A list of bleach defined for each discriminator.
+
+
+
+   .. py:property:: indices
+
+      Get calculated indices.
+
+              
+
+
+   .. py:method:: __getitem__(key)
+
+      Get the discriminator using the subscribed operator.
+
+              
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: _calculate_indices(indices, tuple_size)
+      :staticmethod:
+
+      Calculate the slice of `indices` thatwill be use for input to be
+      used in each RAM.
+
+      Parameters
+      ----------
+      indices : List[int]
+          List of indices.
+      tuple_size : int | List[int] | List[slice]
+          The `tuple_size` or slices.
+
+      Returns
+      -------
+      List[slice]
+          List of slices to be used in the input data to get an address.
+
+
+
+   .. py:method:: _reindex_sample(x)
+
+      Given a numpy array as input, create a list of subsamples acessing
+      the input at each indices.
+
+      Parameters
+      ----------
+      x : np.ndarray
+          The input.
+
+      Returns
+      -------
+      List[np.ndarray]
+          List of sub-arrays, each for respective subset of indices.
+
+      Raises
+      ------
+      ExceptionName
+          Why the exception is raised.
+
+
+
+   .. py:method:: fit(X, y)
+
+      Fit the model over given input samples.
+
+      Parameters
+      ----------
+      X : BooleanArray
+          An array of samples.
+      y : np.ndarray
+          Each respective sample class (it will be indexed as the discriminator)
+
+      Returns
+      -------
+      WiSARD
+          The self object.
+
+
+
+   .. py:method:: predict(X)
+
+      Predict the score of each sample per discriminator.
+
+      Parameters
+      ----------
+      X : BooleanArray
+          An array of samples.
+
+      Returns
+      -----------
+      np.ndarray (an matrix)
+          A matrix where each row has the scores (responses from discriminators)
+          for each sample of X. Each row is a vector where each column is the
+          score (response) given by a discriminator.
+
+
+
+

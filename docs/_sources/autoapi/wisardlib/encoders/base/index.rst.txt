@@ -1,0 +1,46 @@
+:py:mod:`wisardlib.encoders.base`
+=================================
+
+.. py:module:: wisardlib.encoders.base
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.encoders.base.Encoder
+   wisardlib.encoders.base.EncoderDecoder
+
+
+
+
+.. py:class:: Encoder
+
+   Encode a numpy array into a array of booleans.
+
+   .. py:method:: fit(X, y=None, **fit_args)
+
+
+   .. py:method:: fit_transform(X, y=None, **fit_args)
+
+
+   .. py:method:: transform(X)
+      :abstractmethod:
+
+
+
+.. py:class:: EncoderDecoder
+
+   Bases: :py:obj:`Encoder`
+
+   Encode a numpy array into a array of booleans.
+
+   .. py:method:: inverse_transform(X)
+      :abstractmethod:
+
+
+

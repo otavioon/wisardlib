@@ -1,0 +1,48 @@
+:py:mod:`wisardlib.rams.dict_ram`
+=================================
+
+.. py:module:: wisardlib.rams.dict_ram
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.rams.dict_ram.DictRAM
+
+
+
+
+.. py:class:: DictRAM
+
+   Bases: :py:obj:`wisardlib.rams.base.RAM`
+
+   Random access memory implementation.
+
+   .. py:method:: __contains__(key)
+
+
+   .. py:method:: __getitem__(key)
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: add_member(key, inc_val = 1)
+
+
+   .. py:method:: encode_key(key)
+
+
+

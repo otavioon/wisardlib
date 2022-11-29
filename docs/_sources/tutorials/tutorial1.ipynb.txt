@@ -1,0 +1,291 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "8379f4bb-d976-43c3-9e78-4d43916e13dc",
+   "metadata": {},
+   "source": [
+    "# Using WisardLib"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "23161680-368e-4f28-8c85-7906d56095a0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "84bb41ed-1e93-427a-b93e-fa3820cab0a9",
+   "metadata": {},
+   "source": [
+    "In this tutorial we show how to encode samples using thermometer encoder, build a simple WNN, train and predict.\n",
+    "\n",
+    "Let's create two sets (`X_train`, `y_train`), (`X_test`, `y_test`)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "140cfa91-2298-42f0-a3a1-ff7491872dc5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Train set\n",
+    "X_train = np.array([\n",
+    "    [\n",
+    "        0,    # Sample 0\n",
+    "        20,   # Sample 1\n",
+    "        20,   # Sample 2\n",
+    "        50,   # Sample 3\n",
+    "        255,  # Sample 4\n",
+    "        255,  # Sample 5\n",
+    "        200,  # Sample 6\n",
+    "        189   # Sample 7\n",
+    "    ]  \n",
+    "])\n",
+    "\n",
+    "# Class for each train sample\n",
+    "y_train = np.array([\n",
+    "    0, 0, 0, 0, 1, 1, 1, 1\n",
+    "])\n",
+    "\n",
+    "\n",
+    "# Test set\n",
+    "X_test = np.array([\n",
+    "    15, 192\n",
+    "])\n",
+    "\n",
+    "# Class for each test sample\n",
+    "y_test = np.array([0,1])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "981d8325-9056-4651-8041-5cd5a2426f16",
+   "metadata": {},
+   "source": [
+    "## Encoding data using thermometer\n",
+    "\n",
+    "`wisardlib` has a lot of encoders implemented. Encoders transform data into a `BooleanArray` which is the input for WNNs.\n",
+    "The thermometer encode data in a fixed number of bits depending on the interval of minimum and maximum."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "94ece840-4308-4dc9-86ff-0f9c7b8f2ba3",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[False, False, False, False],\n",
+       "       [False, False, False, False],\n",
+       "       [False, False, False, False],\n",
+       "       [False, False, False, False],\n",
+       "       [ True,  True,  True,  True],\n",
+       "       [ True,  True,  True,  True],\n",
+       "       [False,  True,  True,  True],\n",
+       "       [False,  True,  True,  True]])"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from wisardlib.encoders.thermometer import ThermometerEncoder\n",
+    "\n",
+    "number_of_encoding_bits = 4\n",
+    "encoder = ThermometerEncoder(resolution=number_of_encoding_bits)\n",
+    "\n",
+    "encoder.fit(X_train)\n",
+    "\n",
+    "x_train_encoded = encoder.transform(X_train).squeeze()\n",
+    "x_test_encoded = encoder.transform(X_test).squeeze()\n",
+    "\n",
+    "x_train_encoded"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5fab291d-2b10-4a0e-b878-d7d207133fbe",
+   "metadata": {},
+   "source": [
+    "Let's create a WNN model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "b5fd428e-e0e9-4672-8837-8814fe763ffa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from wisardlib.rams.dict_ram import DictRAM\n",
+    "from wisardlib.builder import build_symmetric_wisard\n",
+    "\n",
+    "indices = list(range(4))\n",
+    "tuple_size = 2\n",
+    "shuffle = False\n",
+    "\n",
+    "model = build_symmetric_wisard(\n",
+    "    RAM_cls=DictRAM,\n",
+    "    RAM_creation_kwargs=None,\n",
+    "    number_of_rams_per_discriminator=2,\n",
+    "    number_of_discriminators=2,\n",
+    "    indices=indices,\n",
+    "    tuple_size=tuple_size,\n",
+    "    shuffle_indices=shuffle\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "19a109e3-41a4-4e46-9c19-6c3b1da09a3c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "model.bleach = 1"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "5c977d53-5c3d-44ce-934a-9177bbad7eee",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Fitting model...: 100%|███████████████████████████| 8/8 [00:01<00:00,  6.03it/s]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "WiSARD with 2 discriminators."
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "model.fit(x_train_encoded, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "2eeb249c-5ada-4416-bbd4-78f240206322",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Predicting   ...: 100%|███████████████████████████| 2/2 [00:00<00:00, 13.15it/s]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "array([[2, 0],\n",
+       "       [0, 2]])"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y_pred = model.predict(x_test_encoded)\n",
+    "y_pred"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "b45060e0-23a5-4267-b615-e711add043b7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Untying...: 100%|██████████████████████████████| 2/2 [00:00<00:00, 13443.28it/s]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "array([0, 1])"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from wisardlib.utils import untie_by_first_class\n",
+    "y_pred, ties = untie_by_first_class(y_pred)\n",
+    "y_pred"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "fc3c11f3-ad0d-4e48-8316-37d9f3aad1c8",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1.0"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from sklearn.metrics import accuracy_score\n",
+    "accuracy_score(y_pred, y_test)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

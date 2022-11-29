@@ -1,0 +1,28 @@
+:py:mod:`wisardlib`
+===================
+
+.. py:module:: wisardlib
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   config/index.rst
+   encoders/index.rst
+   rams/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   builder/index.rst
+   utils/index.rst
+   wisard/index.rst
+
+

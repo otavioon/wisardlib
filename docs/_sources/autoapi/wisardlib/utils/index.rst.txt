@@ -1,0 +1,22 @@
+:py:mod:`wisardlib.utils`
+=========================
+
+.. py:module:: wisardlib.utils
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.utils.untie_by_first_class
+
+
+
+.. py:function:: untie_by_first_class(y_pred, use_tqdm = True)
+
+

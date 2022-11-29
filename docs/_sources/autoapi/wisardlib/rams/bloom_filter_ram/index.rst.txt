@@ -1,0 +1,138 @@
+:py:mod:`wisardlib.rams.bloom_filter_ram`
+=========================================
+
+.. py:module:: wisardlib.rams.bloom_filter_ram
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   wisardlib.rams.bloom_filter_ram.CountMinSketchRAM
+   wisardlib.rams.bloom_filter_ram.CountingCuckooRAM
+   wisardlib.rams.bloom_filter_ram.HeavyHittersRAM
+   wisardlib.rams.bloom_filter_ram.StreamThresholdRAM
+
+
+
+
+.. py:class:: CountMinSketchRAM(width = 1000, depth = 5, confidence = None, soft_error_rate = None)
+
+   Bases: :py:obj:`wisardlib.rams.base.RAM`
+
+   Random access memory implementation.
+
+   .. py:method:: __contains__(key)
+
+
+   .. py:method:: __getitem__(key)
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: add_member(key, inc_val = 1)
+
+
+   .. py:method:: encode_key(key)
+
+
+
+.. py:class:: CountingCuckooRAM(capacity=10000, bucket_size=4, max_swaps=500, expansion_rate=2, auto_expand=True, finger_size=4)
+
+   Bases: :py:obj:`wisardlib.rams.base.RAM`
+
+   Random access memory implementation.
+
+   .. py:method:: __contains__(key)
+
+
+   .. py:method:: __getitem__(key)
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: add_member(key, inc_val = 1)
+
+
+   .. py:method:: encode_key(key)
+
+
+
+.. py:class:: HeavyHittersRAM(num_hitters=100, width=1000, depth=5, confidence=None, error_rate=None)
+
+   Bases: :py:obj:`wisardlib.rams.base.RAM`
+
+   Random access memory implementation.
+
+   .. py:method:: __contains__(key)
+
+
+   .. py:method:: __getitem__(key)
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: add_member(key, inc_val = 1)
+
+
+   .. py:method:: encode_key(key)
+
+
+
+.. py:class:: StreamThresholdRAM(threshold=100, width=1000, depth=5, confidence=None, error_rate=None)
+
+   Bases: :py:obj:`wisardlib.rams.base.RAM`
+
+   Random access memory implementation.
+
+   .. py:method:: __contains__(key)
+
+
+   .. py:method:: __getitem__(key)
+
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: add_member(key, inc_val = 1)
+
+
+   .. py:method:: encode_key(key)
+
+
+
