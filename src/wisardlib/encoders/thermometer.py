@@ -1,4 +1,6 @@
 import numpy as np
+from wisardlib.config.type_definitions import BooleanArray
+from wisardlib.encoders.base import Encoder
 
 # @jit(nopython=True, inline='always')
 def int_to_binary_list(value: int, size: int, reverse: bool = False):
@@ -8,7 +10,7 @@ def int_to_binary_list(value: int, size: int, reverse: bool = False):
         return [(value >> i) % 2 for i in range(size, 0, -1)]
 
 
-class ThermometerEncoder:
+class ThermometerEncoder(Encoder):
     def __init__(self, resolution: int):
         self.resolution = resolution
         self.min_val = None
@@ -23,7 +25,7 @@ class ThermometerEncoder:
         )
         return self
 
-    def transform(self, X: np.ndarray):
+    def transform(self, X: np.ndarray) -> BooleanArray:
         new_shape = X.shape + (self.resolution,)
         new_X = [
             int_to_binary_list((1 << x + 1) - 1, self.resolution, reverse=True)
@@ -31,11 +33,8 @@ class ThermometerEncoder:
         ]
         return np.array(new_X, dtype=bool).reshape(new_shape)
 
-    def fit_transform(self, X, y=None, **fit_args):
-        return self.fit(X, y, **fit_args).transform(X)
 
-
-class NestedThermometerEncoder:
+class NestedThermometerEncoder(Encoder):
     def __init__(self, resolution: int, resolution_2: int):
         self.resolution = resolution
         self.resolution_2 = resolution_2
@@ -55,6 +54,3 @@ class NestedThermometerEncoder:
     def transform(self, X: np.ndarray):
         dig_X = np.digitize(X - self.min_val, self.buckets)
         return self.thermometer.fit_transform(X)
-
-    def fit_transform(self, X, y=None, **fit_args):
-        return self.fit(X, y, **fit_args).transform(X)

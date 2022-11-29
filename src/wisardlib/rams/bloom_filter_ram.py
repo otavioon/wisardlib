@@ -5,6 +5,8 @@ from .base import RAM
 from typing import Hashable
 from probables import CountMinSketch, CountingCuckooFilter, HeavyHitters, StreamThreshold
 
+from wisardlib.config.type_definitions import BooleanArray
+
 
 class CountMinSketchRAM(RAM):
     def __init__(
@@ -18,18 +20,18 @@ class CountMinSketchRAM(RAM):
             width=width, depth=depth, confidence=confidence, error_rate=soft_error_rate
         )
 
-    def encode_key(self, key: np.ndarray):
+    def encode_key(self, key: BooleanArray):
         return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key, inc_val: int = 1):
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
-    def __contains__(self, key):
+    def __contains__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -58,18 +60,18 @@ class CountingCuckooRAM(RAM):
             finger_size=finger_size,
         )
 
-    def encode_key(self, key: np.ndarray):
+    def encode_key(self, key: BooleanArray):
         return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key, inc_val: int = 1):
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
-    def __contains__(self, key):
+    def __contains__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -98,18 +100,18 @@ class HeavyHittersRAM(RAM):
             error_rate=error_rate
         )
 
-    def encode_key(self, key: np.ndarray):
+    def encode_key(self, key: BooleanArray):
         return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key, inc_val: int = 1):
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
-    def __contains__(self, key):
+    def __contains__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -137,18 +139,18 @@ class StreamThresholdRAM(RAM):
             error_rate=error_rate
         )
 
-    def encode_key(self, key: np.ndarray):
+    def encode_key(self, key: BooleanArray):
         return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key, inc_val: int = 1):
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
-    def __contains__(self, key):
+    def __contains__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 

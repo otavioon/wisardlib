@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wisardlib"
-version = "0.0.1"
-description = "The wisard RAM-net based model"
+version = "0.0.1-dev"
+description = "The WiSARD weigthless neural network"
 readme = "README.md"
 authors = [{name = "Otavio Napoli", email = "otavio.napoli@gmail.com"}]
 license = {file = "LICENSE"}
@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3"
 ]
-keywords = ["wisard", "ramnet", "machine learning"]
+keywords = ["wisard", "ram-net", "machine learning", "wnn", "weigthless neural networks"]
 dependencies = [
     "numba >= 0.56",
     "numpy",
@@ -29,9 +29,16 @@ dev = [
     "black",
     "isort",
     "pytest",
-    "ipython"
+    "ipython",
+    "sphinx",
+    "sphinx-autoapi",
+    "sphinx_rtd_theme",
+    "nbsphinx",
+    "pandoc",
+    "Ipython",
+    "toml"
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/otavioon/wisard"
-"Bug Tracker" = "https://github.com/otavioon/wisard/issues"
+"Homepage" = "https://github.com/otavioon/wisardlib"
+"Bug Tracker" = "https://github.com/otavioon/wisardlib/issues"

@@ -6,10 +6,26 @@ from numbers import Real
 
 import numpy as np
 import tqdm
+
+from wisardlib.config.type_definitions import BooleanArray
 from wisardlib.rams.base import RAM
 
 
 class Discriminator:
+    """A set of Random Access Memory for a single class.
+
+    Parameters
+    ----------
+    rams : List[RAM]
+        List of Random Access Memories
+    bleach : Real | List[Real]
+        The bleach value (the default is 1).
+        - If the value is a Real number, the bleach will the same to all RAMs
+        - If it is a list of Real, the bleach value will be applyied to each RAM.
+    count_responses : bool
+        if true, count responses higher than bleach, else, return the responses
+        (the default is True).
+    """
     def __init__(
         self,
         rams: List[RAM],
@@ -21,47 +37,127 @@ class Discriminator:
         self._count_responses = count_responses
         self.bleach = bleach
 
-    def fit(self, X: List[np.ndarray], y=None):
+    def fit(self, X: List[BooleanArray], y=None):
+        """Fit model based on the input.
+
+        Parameters
+        ----------
+        X : List[BooleanArray]
+            List of addresses. Each address will be addressed to each RAM.
+        y : type
+            Not used. Each discriminator is used for a single class.
+
+        Returns
+        -------
+        Discriminator
+            The self object.
+
+        Raises
+        ------
+        ValueError
+            If the number of RAMs is different from the number of input addresses.
+
+        """
+        # Do checking
         if len(X) != len(self._rams):
             raise ValueError("X must have same length as number of RAMs")
+        # Add member of each input to the respective RAM
         for ram, sample in zip(self._rams, X):
             ram.add_member(sample)
         return self
 
-    def predict(self, X: List[np.ndarray]):
+    def predict(self, X: List[BooleanArray]) -> np.ndarray:
+        """Make predictions for each sample.
+
+        Parameters
+        ----------
+        X : List[BooleanArray]
+            List of addresses. Each address will be checked against each RAM.
+
+        Returns
+        -------
+        np.ndarray
+            The array with the scores for each class. If `_count_responses` is
+            True, it will be returned it will be returned the number of times
+            that each input response is greater than bleach. Else, it will be
+            returned the sum of responses (frequency of the address) that is
+            higher than bleach.
+
+        Raises
+        ------
+        ValueError
+            If the number of RAMs is different from the number of input addresses.
+
+        """
+        # Do checking
         if len(X) != len(self._rams):
             raise ValueError("X must have same length as number of RAMs")
 
+        # If bleach is a number, it will be the same for all RAMs
         if isinstance(self._bleach, Real):
             bleach_vals = itertools.repeat(self._bleach, times=len(X))
+        # Else: one singular bleach value to one RAMs
         else:
             bleach_vals = self._bleach
 
+        # If True, count the number of times each response if higher than
+        # respective RAM's bleach
         if self._count_responses:
             return sum(
                 int(ram[x] >= bleach)
                 for ram, bleach, x in zip(self._rams, bleach_vals, X)
             )
+        # Else, return the sum of responses of responses higher than respective
+        # RAM's bleach
         else:
             return sum(
                 0 if ram[x] < bleach else ram[x]
                 for ram, bleach, x in zip(self._rams, bleach_vals, X)
             )
 
-        for ram, bleach, x in zip(self._rams, bleach_vals, X):
-            value = ram[x]
-            if self._count_responses:
-                response += int(value >= bleach)
-            else:
-                response += 0 if value < bleach else value
-        return response
+        # for ram, bleach, x in zip(self._rams, bleach_vals, X):
+        #     value = ram[x]
+        #     if self._count_responses:
+        #         response += int(value >= bleach)
+        #     else:
+        #         response += 0 if value < bleach else value
+        # return response
 
     @property
     def bleach(self):
+        """Bleach getter.
+
+        Returns
+        -------
+        Real | List[Real]
+            The bleach value.
+
+        """
         return self._bleach
 
     @bleach.setter
     def bleach(self, value: Real | List[Real]):
+        """Bleach setter.
+
+        Parameters
+        ----------
+        value : Real | List[Real]
+            If bleach is Real, the same bleach value will be applyied to each
+            RAM. Else, one specific bleach will be applyied to each RAM.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If a list of bleaches is passed with different number of RAMs.
+
+        TypeError
+            If the `value` passed is not a Real number nor a list
+
+        """
         if isinstance(value, list):
             if len(value) != len(self._rams):
                 raise ValueError("Length of bleach must be the same as number of RAMS")
@@ -69,9 +165,22 @@ class Discriminator:
         elif isinstance(value, Real):
             self._bleach = value
         else:
-            raise TypeError("Bleach must be list or real number")
+            raise TypeError("Bleach must be a list of real numbers or real number")
 
     def __getitem__(self, key) -> RAM:
+        """Get a single RAM with python's subscribed operator.
+
+        Parameters
+        ----------
+        key : int | slice
+            The key to be get.
+
+        Returns
+        -------
+        RAM
+            The RAMs gathered.
+
+        """
         return self._rams[key]
 
     def __str__(self) -> str:
@@ -85,6 +194,34 @@ class Discriminator:
 
 
 class WiSARD:
+    """Short summary.
+
+    Parameters
+    ----------
+    discriminators : List[Discriminator]
+        A list of RAM-discriminators. One for each desired class.
+    indices : List[int]
+        The list of indices that will be selected by each tuple.
+    tuple_size : int | List[int] | List[slice]
+        Size of each tuple. For each RAM, `tuple_size` indices will be
+        selected from `indices`, consecutively.
+        The type can be:
+        - An non-negative integer: the tuples of same size will be consecutively
+            be selected from `indices`. For instance, if `tuple_size` == 3, then
+            for each RAM, the following indices will be selected:
+            [0 .. `tuple_size`, `tuple_size+1`..2*`tuple_size`, ...]
+        - An list of integer: the indices will of each element will be:
+            0..sum(tuple_size[:1]), sum(tuple_size[:1])..sum(tuple_size[:2]), ...
+        - An list of 2-element lists. Each element is the start and end of the
+            range of the `indices`.
+        **NOTE**: `data[selected_indices] == RAM address`
+        **NOTE**: The sum of `tuple_size` (if a list) must be equals `indices` length.
+    shuffle_indices : bool
+        Shuffle indices before selecting composing an address (the default is False).
+    use_tqdm : bool
+        Use tqdm progress bar (the default is True).
+
+    """
     def __init__(
         self,
         discriminators: List[Discriminator],
@@ -100,7 +237,7 @@ class WiSARD:
         _indices = indices.copy()
         if shuffle_indices:
             random.shuffle(_indices)
-        self._indices: List[np.ndarray] = self._calculate_indices(_indices, tuple_size)
+        self._indices: List[slice] = self._calculate_indices(_indices, tuple_size)
 
         for d in self._discriminators:
             assert len(d) >= len(
@@ -111,10 +248,26 @@ class WiSARD:
 
     @staticmethod
     def _calculate_indices(
-        indices, tuple_size: int | List[int] | List[List[int]]
+        indices, tuple_size: int | List[int] | List[slice]
     ) -> List[slice]:
+        """Calculate the slice of `indices` thatwill be use for input to be
+        used in each RAM.
+
+        Parameters
+        ----------
+        indices : List[int]
+            List of indices.
+        tuple_size : int | List[int] | List[slice]
+            The `tuple_size` or slices.
+
+        Returns
+        -------
+        List[slice]
+            List of slices to be used in the input data to get an address.
+
+        """
         if isinstance(tuple_size, list):
-            if isinstance(tuple_size[0], list):
+            if isinstance(tuple_size[0], slice):
                 # Allows overlap by specifying slices manually
                 _indices = np.array(indices)
                 return [_indices[s] for s in tuple_size]
@@ -135,117 +288,133 @@ class WiSARD:
         return [indices[s] for s in slices]
 
     def __getitem__(self, key):
+        """Get the discriminator using the subscribed operator.
+
+        """
         return self._discriminators[key]
 
     @property
     def bleach(self) -> List[List[Real]] | List[Real]:
+        """Get the bleach of each discriminator.
+
+        Returns
+        -------
+        List[List[Real]] | List[Real]
+            A list of bleach defined for each discriminator.
+
+        """
         return [d.bleach for d in self._discriminators]
 
     @bleach.setter
-    def bleach(self, value: int | List[int]):
+    def bleach(self, value: Real | List[Real]):
+        """Set the same bleach value to all discriminators.
+
+        Parameters
+        ----------
+        value : Real | List[Real]
+            The bleach value.
+
+        Returns
+        -------
+        None
+
+        """
         for d in self._discriminators:
             d.bleach = value
 
     @property
     def indices(self):
+        """Get calculated indices.
+
+        """
         return self._indices
 
-    @property
-    def min_val(self) -> int:
-        return min(d.min_val for d in self._discriminators)
+    def _reindex_sample(self, x: BooleanArray) -> List[BooleanArray]:
+        """Given a numpy array as input, create a list of subsamples acessing
+        the input at each indices.
 
-    @property
-    def max_val(self) -> int:
-        return max(d.max_val for d in self._discriminators)
+        Parameters
+        ----------
+        x : np.ndarray
+            The input.
 
-    def _reindex_sample(self, x: np.ndarray) -> List[np.ndarray]:
+        Returns
+        -------
+        List[np.ndarray]
+            List of sub-arrays, each for respective subset of indices.
+
+        Raises
+        ------
+        ExceptionName
+            Why the exception is raised.
+
+        """
         return [x[i] for i in self.indices]
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X: BooleanArray, y: np.ndarray):
+        """Fit the model over given input samples.
+
+        Parameters
+        ----------
+        X : BooleanArray
+            An array of samples.
+        y : np.ndarray
+            Each respective sample class (it will be indexed as the discriminator)
+
+        Returns
+        -------
+        WiSARD
+            The self object.
+
+        """
         it = range(len(X))
+        # If use tqdm, create an tqdm iterator at each sample
         if self.use_tqdm:
             it = tqdm.tqdm(
                 it, total=len(X), leave=True, position=0, desc="Fitting model..."
             )
+        # Iterate over inputs
         for i in it:
+            # Transform each input as a list of subsamples (based on indices)
             sample = self._reindex_sample(X[i])
             self._discriminators[y[i]].fit(sample)
         return self
 
-    def predict(self, X: np.ndarray):
+    def predict(self, X: BooleanArray) -> np.ndarray:
+        """Predict the score of each sample per discriminator.
+
+        Parameters
+        ----------
+        X : BooleanArray
+            An array of samples.
+
+        Returns
+        -----------
+        np.ndarray (an matrix)
+            A matrix where each row has the scores (responses from discriminators)
+            for each sample of X. Each row is a vector where each column is the
+            score (response) given by a discriminator.
+
+        """
         it = range(len(X))
+        # Iterate over each sample from X
         if self.use_tqdm:
             it = tqdm.tqdm(
                 it, total=len(X), leave=True, position=0, desc="Predicting   ..."
             )
-        y_pred = []
+        # List with the responses of each disriminator per sample
+        y_pred: List[np.ndarray] = []
+        #Iterate over samples
         for i in it:
+            # Reindex the input according to indices
             sample = self._reindex_sample(X[i])
+            # Calculate the response for each discriminator
             responses = np.array([d.predict(sample) for d in self._discriminators])
             y_pred.append(responses)  # np.where(responses == responses.max())[0])
         return np.array(y_pred)
 
-    #
-    # def _reindex_sample(self, x: np.ndarray) -> List[np.ndarray]:
-    #     xs = x[self._indices]
-    #     xs = [np.pad(x[s], (0, (x[s].size - (s.stop - s.start)))) for s in self._slices]
-    #     return xs
-    #
-    # def _fit_sample(self, x: np.ndarray, discriminator: Discriminator):
-    #     xs = self._reindex_sample(x)
-    #     discriminator.fit(xs)
-    #
-    # def _predict_sample(self, x: np.ndarray, soft_error_rate: float = 0.0):
-    #     xs = self._reindex_sample(x)
-    #     responses = np.array(
-    #         [
-    #             d.predict(xs, soft_error_rate=soft_error_rate)
-    #             for d in self._discriminators
-    #         ]
-    #     )
-    #     max_response = responses.max()
-    #     return np.where(responses == max_response)[0]
-    #
-    # def fit(self, X: np.ndarray, y: np.ndarray, use_tqdm: bool = False):
-    #     it = range(len(X))
-    #     if use_tqdm:
-    #         it = tqdm.tqdm(
-    #             it, total=len(X), leave=True, position=0, desc="Fitting model"
-    #         )
-    #     for i in it:
-    #         self._fit_sample(X[i], self._discriminators[y[i]])
-    #
-    #     return self
-    #
-    # def predict(
-    #     self,
-    #     X: np.ndarray,
-    #     y: np.ndarray,
-    #     use_tqdm: bool = False,
-    #     soft_error_rate: float = 0.0,
-    #     bleach: Optional[Union[int, List[int]]] = None,
-    # ):
-    #     if bleach is not None:
-    #         self.bleach = bleach
-    #     y_pred = [self._predict_sample(x, soft_error_rate) for x in X]
-    #     return y_pred
-
     def __str__(self) -> str:
-        return f"WiSARD with {len(self._discriminators)} discriminator. Min, max: [{self.min_val}, {self.max_val}]"
+        return f"WiSARD with {len(self._discriminators)} discriminators."
 
     def __repr__(self) -> str:
         return str(self)
-
-
-# def simple_discriminators_build(
-#     num_rams: int,
-#     ram_cls: type,
-#     ram_kwargs: dict = None,
-#     num_disc: int = 1,
-#     bleach: int = 1,
-# ) -> List[Discriminator]:
-#     ram_kwargs = ram_kwargs or dict()
-#     return [
-#         Discriminator([ram_cls(**ram_kwargs) for j in range(num_rams)])
-#         for i in range(num_disc)
-#     ]

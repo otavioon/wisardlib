@@ -4,6 +4,8 @@ from numba.typed import Dict
 from .base import RAM
 from typing import Hashable
 
+from wisardlib.config.type_definitions import BooleanArray
+
 
 class DictRAM(RAM):
     def __init__(self):
@@ -11,21 +13,21 @@ class DictRAM(RAM):
             key_type=numba.core.types.string, value_type=numba.core.types.int64
         )
 
-    def encode_key(self, key: np.ndarray):
+    def encode_key(self, key: BooleanArray):
         return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key, inc_val: int = 1):
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
         if key not in self._addresses:
             self._addresses[key] = inc_val
         else:
             self._addresses[key] += inc_val
 
-    def __contains__(self, key):
+    def __contains__(self, key: BooleanArray):
         key = self.encode_key(key)
         return key in self._addresses
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: BooleanArray):
         key = self.encode_key(key)
         return self._addresses.get(key, 0)
 
