@@ -15,22 +15,40 @@ configs = [
     # Bloom filter
     RAMConfig(name="count-bloom", RAM_cls_name="count-bloom", RAM_cls_kwargs={"est_elements": 1000, "false_positive_rate": 0.05}),
     RAMConfig(name="count-bloom", RAM_cls_name="count-bloom", RAM_cls_kwargs={"est_elements": 100, "false_positive_rate": 0.05}),
+    RAMConfig(name="count-bloom", RAM_cls_name="count-bloom", RAM_cls_kwargs={"est_elements": 100, "false_positive_rate": 0.02}),
+    RAMConfig(name="count-bloom", RAM_cls_name="count-bloom", RAM_cls_kwargs={"est_elements": 100, "false_positive_rate": 0.08}),
 
     # Count-Min-Sketch
     RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 1000, "depth": 5}),
+    RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 500, "depth": 5}),
     RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 100, "depth": 5}),
+    RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 1000, "depth": 3}),
+    RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 500, "depth": 3}),
+    RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 100, "depth": 3}),
 
     # Count cuckoo
     RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 1000, "bucket_size": 4}),
+    RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 500, "bucket_size": 4}),
     RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 100, "bucket_size": 4}),
+    RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 1000, "bucket_size": 2}),
+    RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 500, "bucket_size": 2}),
+    RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 100, "bucket_size": 2}),
 
     # Heavy Hitters
     RAMConfig(name="heavy-hitters", RAM_cls_name="heavy-hitters", RAM_cls_kwargs={"num_hitters": 100, "width": 1000, "depth": 5}),
     RAMConfig(name="heavy-hitters", RAM_cls_name="heavy-hitters", RAM_cls_kwargs={"num_hitters": 50, "width": 100, "depth": 5}),
+    RAMConfig(name="heavy-hitters", RAM_cls_name="heavy-hitters", RAM_cls_kwargs={"num_hitters": 100, "width": 1000, "depth": 3}),
+    RAMConfig(name="heavy-hitters", RAM_cls_name="heavy-hitters", RAM_cls_kwargs={"num_hitters": 50, "width": 100, "depth": 3}),
 
     # Stream Threshold
     RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 100, "width": 1000, "depth": 5}),
     RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 50, "width": 1000, "depth": 5}),
+    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 100, "width": 250, "depth": 5}),
+    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 50, "width": 250, "depth": 5}),
+    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 100, "width": 1000, "depth": 3}),
+    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 50, "width": 1000, "depth": 3}),
+    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 100, "width": 250, "depth": 3}),
+    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 50, "width": 250, "depth": 3}),
 ]
 
 
