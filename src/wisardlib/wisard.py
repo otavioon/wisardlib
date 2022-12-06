@@ -203,8 +203,9 @@ class WiSARD:
     ----------
     discriminators : List[Discriminator]
         A list of RAM-discriminators. One for each desired class.
-    indices : List[int]
-        The list of indices that will be selected by each tuple.
+    indices : int | List[int]
+        The list of indices that will be selected by each tuple or an int
+        that will generate a list of sequential indices.
     tuple_size : int | List[int] | List[slice]
         Size of each tuple. For each RAM, `tuple_size` indices will be
         selected from `indices`, consecutively.
@@ -234,10 +235,15 @@ class WiSARD:
         use_tqdm: bool = True,
     ):
         assert isinstance(discriminators, Iterable), "Must be a list of discriminators"
-        assert isinstance(indices, Iterable), "Must be a list of indices"
 
         self._discriminators: List[Discriminator] = discriminators
-        _indices = indices.copy()
+        if isinstance(indices, Iterable):
+            _indices = indices.copy()
+        elif isinstance(indices, int):
+            _indices = list(range(indices))
+        else:
+            raise TypeError("Indices must be a list or a interger value")
+
         if shuffle_indices:
             random.shuffle(_indices)
         self._indices: List[slice] = self._calculate_indices(_indices, tuple_size)

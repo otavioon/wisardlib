@@ -4,6 +4,7 @@ import pandas as pd
 import random
 import time
 import logging
+import json
 from dataclasses import dataclass, field
 from typing import List
 
@@ -78,6 +79,16 @@ def load_dataset(name: str) -> tuple:
     (x_train, y_train), (x_test, y_test) = np.load(data_path, allow_pickle=True)
     return (x_train, y_train), (x_test, y_test)
 
+def discretize_labels(labels: np.ndarray):
+    single_labels = list(set(labels))
+    return np.array([single_labels.index(l) for l in labels])
+
+def set_random_seeds():
+    seed = int(time.time())
+    random.seed(seed)
+    np.random.seed(seed)
+    return seed
+
 def run_experiment(
     exp_name: str,
     output_path: Path,
@@ -98,6 +109,9 @@ def run_experiment(
     # Load dataset
     (x_train, y_train), (x_test, y_test) = load_dataset(dataset_name)
 
+    y_train = discretize_labels(y_train)
+    y_test = discretize_labels(y_test)
+
     # Encode dataset
     encoder_cls = encoders[encoder_name]
     encoder_kwargs = encoder_kwargs or dict()
@@ -108,25 +122,29 @@ def run_experiment(
     x_test  = [x.ravel() for x in encoder.transform(x_test)]
 
     # Get params
-    indices = list(range(len(x_train[0].ravel())))
-    n_classes = len(np.unique(y_train))+2
+    indices = len(x_train[0].ravel())
+    n_classes = max(y_train)+1
 
     results = []
+    times = []
 
-    for config in ram_configs:
+    for config_no, config in enumerate(ram_configs):
         for run_no in range(number_runs):
-            logging.info("Creating model...")
+            seed = set_random_seeds()
+            exp_start_time = time.time()
+            logging.info(f"Running experiment (config={config_no+1}/{len(ram_configs)}) (run={run_no+1}/{number_runs}): {config}")
+            # logging.info("Creating model...")
             model = build_symmetric_wisard(
                 RAM_cls=rams[config.RAM_cls_name],
                 RAM_creation_kwargs=config.RAM_cls_kwargs,
-                number_of_rams_per_discriminator=len(indices)//tuple_size,
+                number_of_rams_per_discriminator=indices//tuple_size,
                 number_of_discriminators=n_classes,
                 indices=indices,
                 tuple_size=tuple_size,
                 shuffle_indices=True
             )
 
-            logging.info("Training model...")
+            # logging.info("Training model...")
             train_start = time.time()
             model.fit(x_train, y_train)
             train_end = time.time()
@@ -143,6 +161,7 @@ def run_experiment(
                 f1_macro = f1_score(y_test, y_pred, average="macro")
                 f1_micro = f1_score(y_test, y_pred, average="micro")
                 f1_weighted = f1_score(y_test, y_pred, average="weighted")
+                logging.info(f"Accuracy: {acc:.3f}, f1-score (weighted): {f1_weighted:.3f}, ties: {ties}")
 
                 results.append({
                     "bleach": bleach_val,
@@ -155,18 +174,29 @@ def run_experiment(
                     "train time": train_end - train_start,
                     "predict time": predict_end - predict_start,
                     "ram name": config.name,
-                    "ram kwargs": str(config.RAM_cls_kwargs),
+                    "ram kwargs": json.dumps(config.RAM_cls_kwargs),
                     "tuple size": tuple_size,
                     "dataset name": dataset_name,
                     "encoder": encoder_name,
-                    "encoder kwargs": str(encoder_kwargs),
+                    "encoder kwargs": json.dumps(encoder_kwargs),
                     "experiment name": exp_name,
-                    "size": model.size()
+                    "model size": model.size(),
+                    "train samples": len(y_train),
+                    "test samples": len(y_test),
+                    "classes": n_classes,
+                    "rams per discriminator": indices//tuple_size,
+                    "discriminators": n_classes,
+                    "seed": seed,
+                    "indices": indices
                 })
+            exp_end_time = time.time()
+            times.append(exp_end_time-exp_start_time)
+            logging.info(f"The run took {exp_end_time-exp_start_time:.3f} seconds (estimated remaining time: {len(ram_configs)*number_runs*np.mean(times)-config_no*number_runs*np.mean(times)-(run_no+1)*np.mean(times):.2f} seconds...)\n")
 
     df = pd.DataFrame(results)
     exp_dir.mkdir(exist_ok=True, parents=True)
     exp_path = exp_dir / f"{exp_id}.csv"
     df.to_csv(exp_path, index=False)
+    print(f"Results saved to: {exp_path}")
 
     return df

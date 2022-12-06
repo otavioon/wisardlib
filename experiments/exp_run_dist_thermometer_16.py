@@ -4,10 +4,13 @@ import numpy as np
 import pandas as pd
 import random
 import logging
+import traceback
 
 from base import run_experiment, RAMConfig
 
-logging.getLogger().setLevel(logging.INFO)
+formatter = '[%(asctime)s] [%(levelname)s]: %(message)s'
+logging.basicConfig(format=formatter, level=logging.INFO)
+
 
 configs = [
     RAMConfig(name="DictRam", RAM_cls_name="dict"),
@@ -58,20 +61,20 @@ configs = [
 # except Exception as e:
 #     print(f"Error (exp2): {e}")
 #
-# try:
-#     df = run_experiment(
-#         exp_name="breast_cancer Exp",
-#         output_path="experiments/results",
-#         ram_configs=configs,
-#         dataset_name="breast_cancer",
-#         encoder_name="distributive-thermometer",
-#         encoder_kwargs={"resolution": 16},
-#         tuple_size=16,
-#         number_runs=3,
-#         bleach=[2,5]
-#     )
-# except Exception as e:
-#     print(f"Error (exp3): {e}")
+try:
+    df = run_experiment(
+        exp_name="breast_cancer Exp",
+        output_path="experiments/results",
+        ram_configs=configs,
+        dataset_name="breast_cancer",
+        encoder_name="distributive-thermometer",
+        encoder_kwargs={"resolution": 16},
+        tuple_size=16,
+        number_runs=3,
+        bleach=[2,5]
+    )
+except Exception as e:
+    print(f"Error (exp3): {e}")
 
 # try:
 #     df = run_experiment(
@@ -118,20 +121,20 @@ configs = [
 # except Exception as e:
 #     print(f"Error (exp6): {e}")
 #
-    # try:
-    #     df = run_experiment(
-    #         exp_name="segment Exp",
-    #         output_path="experiments/results",
-    #         ram_configs=configs,
-    #         dataset_name="segment",
-    #         encoder_name="distributive-thermometer",
-    #         encoder_kwargs={"resolution": 16},
-    #         tuple_size=16,
-    #         number_runs=3,
-    #         bleach=[2,5]
-    #     )
-    # except Exception as e:
-    #     print(f"Error (exp7): {e}")
+# try:
+#     df = run_experiment(
+#         exp_name="segment Exp",
+#         output_path="experiments/results",
+#         ram_configs=configs,
+#         dataset_name="segment",
+#         encoder_name="distributive-thermometer",
+#         encoder_kwargs={"resolution": 16},
+#         tuple_size=16,
+#         number_runs=3,
+#         bleach=[2,5]
+#     )
+# except Exception as e:
+#     print(traceback.format_exc())
 #
 # try:
 #     df = run_experiment(
