@@ -1,10 +1,21 @@
+import pickle
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import numba.core.types
 from numba.typed import Dict
 from .base import RAM
 from typing import Hashable
 
+
 from wisardlib.config.type_definitions import BooleanArray
+
+def size_of_dict(numba_dict) -> int:
+    with tempfile.NamedTemporaryFile() as tmp:
+        pickle.dump(dict(numba_dict), tmp, pickle.HIGHEST_PROTOCOL)
+        tmp.flush()
+        return Path(tmp.name).stat().st_size
 
 
 class DictRAM(RAM):
@@ -12,9 +23,12 @@ class DictRAM(RAM):
         self._addresses = Dict.empty(
             key_type=numba.core.types.string, value_type=numba.core.types.int64
         )
+        self._key_len = 1
 
     def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+        k = str().join(str(k * 1) for k in key)
+        self._key_len = len(k)
+        return k
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -36,3 +50,6 @@ class DictRAM(RAM):
 
     def __repr__(self) -> str:
         return str(self)
+
+    def size(self) -> int:
+        return len(self._addresses) * (self._key_len + 8)

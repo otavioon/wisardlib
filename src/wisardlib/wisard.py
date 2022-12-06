@@ -192,6 +192,9 @@ class Discriminator:
     def __len__(self) -> int:
         return len(self._rams)
 
+    def size(self) -> int:
+        return sum(r.size() for r in self._rams)
+
 
 class WiSARD:
     """Short summary.
@@ -418,3 +421,6 @@ class WiSARD:
 
     def __repr__(self) -> str:
         return str(self)
+
+    def size(self) -> int:
+        return sum(d.size() for d in self._discriminators)

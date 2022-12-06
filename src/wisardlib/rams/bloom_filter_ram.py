@@ -1,11 +1,54 @@
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import numba.core.types
 from numba.typed import Dict
-from .base import RAM
 from typing import Hashable
-from probables import CountMinSketch, CountingCuckooFilter, HeavyHitters, StreamThreshold
+from probables import CountingBloomFilter, CountMinSketch, CountingCuckooFilter, HeavyHitters, StreamThreshold
 
+from .base import RAM
 from wisardlib.config.type_definitions import BooleanArray
+
+def size_of_bloom(filter) -> int:
+    with tempfile.NamedTemporaryFile() as tmp:
+        filter.export(tmp.name)
+        tmp.flush()
+        return Path(tmp.name).stat().st_size
+
+
+class CountingBloomFilterRAM(RAM):
+    def __init__(
+        self,
+        est_elements: int = 1000,
+        false_positive_rate: float = 0.05
+    ):
+        self.bloom_filter = CountingBloomFilter(
+            est_elements=est_elements, false_positive_rate=false_positive_rate)
+
+    def encode_key(self, key: BooleanArray):
+        return str().join(str(k * 1) for k in key)
+
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
+        key = self.encode_key(key)
+        self.bloom_filter.add(key)
+
+    def __contains__(self, key: BooleanArray):
+        key = self.encode_key(key)
+        return self.bloom_filter.check(key) > 0
+
+    def __getitem__(self, key: BooleanArray):
+        key = self.encode_key(key)
+        return self.bloom_filter.check(key)
+
+    def __str__(self) -> str:
+        return f"CountingBloomFilterRAM with {str(self.bloom_filter)}"
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def size(self) -> int:
+        return size_of_bloom(self.bloom_filter)
 
 
 class CountMinSketchRAM(RAM):
@@ -41,6 +84,45 @@ class CountMinSketchRAM(RAM):
     def __repr__(self) -> str:
         return str(self)
 
+    def size(self) -> int:
+        return size_of_bloom(self.bloom_filter)
+
+
+class CountMinSketchRAM(RAM):
+    def __init__(
+        self,
+        width: int = 1000,
+        depth: int = 5,
+        confidence: float = None,
+        soft_error_rate: float = None,
+    ):
+        self.bloom_filter = CountMinSketch(
+            width=width, depth=depth, confidence=confidence, error_rate=soft_error_rate
+        )
+
+    def encode_key(self, key: BooleanArray):
+        return str().join(str(k * 1) for k in key)
+
+    def add_member(self, key: BooleanArray, inc_val: int = 1):
+        key = self.encode_key(key)
+        self.bloom_filter.add(key)
+
+    def __contains__(self, key: BooleanArray):
+        key = self.encode_key(key)
+        return self.bloom_filter.check(key) > 0
+
+    def __getitem__(self, key: BooleanArray):
+        key = self.encode_key(key)
+        return self.bloom_filter.check(key)
+
+    def __str__(self) -> str:
+        return f"CountMinSketchRAM with {str(self.bloom_filter)}"
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def size(self) -> int:
+        return size_of_bloom(self.bloom_filter)
 
 class CountingCuckooRAM(RAM):
     def __init__(
@@ -80,6 +162,9 @@ class CountingCuckooRAM(RAM):
 
     def __repr__(self) -> str:
         return str(self)
+
+    def size(self) -> int:
+        return size_of_bloom(self.bloom_filter)
 
 
 class HeavyHittersRAM(RAM):
@@ -121,6 +206,10 @@ class HeavyHittersRAM(RAM):
     def __repr__(self) -> str:
         return str(self)
 
+    def size(self) -> int:
+        return size_of_bloom(self.bloom_filter)
+
+
 class StreamThresholdRAM(RAM):
     def __init__(
         self,
@@ -159,3 +248,6 @@ class StreamThresholdRAM(RAM):
 
     def __repr__(self) -> str:
         return str(self)
+
+    def size(self) -> int:
+        return size_of_bloom(self.bloom_filter)

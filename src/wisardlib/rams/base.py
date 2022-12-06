@@ -16,3 +16,6 @@ class RAM:
     @abstractmethod
     def __getitem__(self, key: BooleanArray) -> int:
         raise NotImplementedError
+
+    def size(self):
+        raise NotImplementedError

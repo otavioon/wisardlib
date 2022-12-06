@@ -18,6 +18,7 @@ keywords = ["wisard", "ram-net", "machine learning", "wnn", "weigthless neural n
 dependencies = [
     "numba >= 0.56",
     "numpy",
+    "pandas",
     "scikit-learn",
     "tqdm",
     "pyprobables"
