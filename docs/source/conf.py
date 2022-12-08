@@ -12,7 +12,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
+
+sys.path.insert(0, os.path.abspath("../../"))
 
 import sphinx_rtd_theme
 import toml
@@ -23,12 +24,12 @@ import toml
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'autoapi.extension',
-    'sphinx_rtd_theme',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autodoc.typehints',
-    'sphinx.ext.mathjax',
+    "sphinx.ext.autodoc",
+    "autoapi.extension",
+    "sphinx_rtd_theme",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autodoc.typehints",
+    "sphinx.ext.mathjax",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting"
     # "sphinx_codeautolink",
@@ -37,11 +38,11 @@ extensions = [
 ]
 
 suppress_warnings = [
-    'nbsphinx.localfile',
-    'nbsphinx.gallery',
-    'nbsphinx.thumbnail',
-    'nbsphinx.notebooktitle',
-    'nbsphinx.ipywidgets',
+    "nbsphinx.localfile",
+    "nbsphinx.gallery",
+    "nbsphinx.thumbnail",
+    "nbsphinx.notebooktitle",
+    "nbsphinx.ipywidgets",
 ]
 
 # sphinx_gallery_conf = {
@@ -52,53 +53,49 @@ suppress_warnings = [
 # }
 
 ####### Auto API
-autoapi_type = 'python'
-autoapi_dirs = ['../../src/wisardlib']
-autoapi_member_order = 'alphabetical'
+autoapi_type = "python"
+autoapi_dirs = ["../../src/wisardlib"]
+autoapi_member_order = "alphabetical"
 autoapi_python_use_implicit_namespaces = True
-autoapi_python_class_content = 'both'
-autoapi_file_patterns = ['*.py']
+autoapi_python_class_content = "both"
+autoapi_file_patterns = ["*.py"]
 autoapi_generate_api_docs = True
 autoapi_add_toctree_entry = False
 # source_suffix = '.rst'
-autodoc_typehints = 'description'
+autodoc_typehints = "description"
 
 
 ######## NBSPHINX
-nbsphinx_execute = 'never'
+nbsphinx_execute = "never"
 nbsphinx_allow_errors = True
-nbsphinx_codecell_lexer = 'python3'
+nbsphinx_codecell_lexer = "python3"
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'pdf'}",
     "--InlineBackend.rc={'figure.dpi': 96}",
 ]
 
 
-
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # -- Project information -----------------------------------------------------
 
-project = 'wisardlib'
-copyright = '2022, Otavio Napoli'
-author = 'Otavio Napoli'
+project = "wisardlib"
+copyright = "2022, Otavio Napoli"
+author = "Otavio Napoli"
 
 # The full version, including alpha/beta/rc tags
 version = toml.load("../../pyproject.toml")["project"]["version"]
 release = version
 
-source_suffix = ['.rst']
-master_doc = 'index'
+source_suffix = [".rst"]
+master_doc = "index"
 
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [
-    '**.ipynb_checkpoints',
-    "**ipynb_checkpoints"
-]
+exclude_patterns = ["**.ipynb_checkpoints", "**ipynb_checkpoints"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -106,13 +103,13 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
-htmlhelp_basename = 'wisardlib documentation'
+htmlhelp_basename = "wisardlib documentation"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
 
-source_encoding = 'utf-8'
+source_encoding = "utf-8"

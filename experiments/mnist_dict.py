@@ -1,11 +1,19 @@
-from wisardlib.encoders.thermometer import ThermometerEncoder, DistributiveThermometerEncoder
+from wisardlib.encoders.thermometer import (
+    ThermometerEncoder,
+    DistributiveThermometerEncoder,
+)
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import random
 
 from wisardlib.rams.dict_ram import DictRAM
-from wisardlib.rams.bloom_filter_ram import CountMinSketchRAM, CountingCuckooRAM, HeavyHittersRAM, StreamThresholdRAM
+from wisardlib.rams.bloom_filter_ram import (
+    CountMinSketchRAM,
+    CountingCuckooRAM,
+    HeavyHittersRAM,
+    StreamThresholdRAM,
+)
 from wisardlib.builder import build_symmetric_wisard
 from wisardlib.utils import untie_by_first_class
 from sklearn.metrics import accuracy_score, f1_score
@@ -30,7 +38,7 @@ encoder.fit(x_train)
 print("Encoding training set...")
 x_train = [x.ravel() for x in encoder.transform(x_train)]
 print("Encoding test set...")
-x_test  = [x.ravel() for x in encoder.transform(x_test)]
+x_test = [x.ravel() for x in encoder.transform(x_test)]
 indices = list(range(len(x_train[0].ravel())))
 tuple_size = 16
 
@@ -39,7 +47,7 @@ rams = {
     "count-min-sketch": CountMinSketchRAM,
     "count-cuckoo": CountingCuckooRAM,
     "heavy-hitters": HeavyHittersRAM,
-    "stream-threshold": StreamThresholdRAM
+    "stream-threshold": StreamThresholdRAM,
 }
 
 results = []
@@ -53,11 +61,11 @@ for name, ram_cls in rams.items():
         w = build_symmetric_wisard(
             RAM_cls=ram_cls,
             RAM_creation_kwargs=None,
-            number_of_rams_per_discriminator=len(indices)//tuple_size,
+            number_of_rams_per_discriminator=len(indices) // tuple_size,
             number_of_discriminators=n_classes,
             indices=indices,
             tuple_size=tuple_size,
-            shuffle_indices=True
+            shuffle_indices=True,
         )
 
         # print("Fitting model...")
@@ -81,12 +89,9 @@ for name, ram_cls in rams.items():
         accs.append(acc)
         tiess.append(ties)
 
-    results.append({
-        "name": name,
-        "acc": np.mean(accs),
-        "std": np.std(accs),
-        "ties": np.mean(ties)
-    })
+    results.append(
+        {"name": name, "acc": np.mean(accs), "std": np.std(accs), "ties": np.mean(ties)}
+    )
 
 
 df = pd.DataFrame(results)

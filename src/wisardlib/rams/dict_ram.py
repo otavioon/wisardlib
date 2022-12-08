@@ -11,6 +11,7 @@ from typing import Hashable
 
 from wisardlib.config.type_definitions import BooleanArray
 
+
 def size_of_dict(numba_dict) -> int:
     with tempfile.NamedTemporaryFile() as tmp:
         pickle.dump(dict(numba_dict), tmp, pickle.HIGHEST_PROTOCOL)
@@ -25,10 +26,10 @@ class DictRAM(RAM):
         )
         self._key_len = 1
 
-    def encode_key(self, key: BooleanArray):
-        k = str().join(str(k * 1) for k in key)
-        self._key_len = len(k)
-        return k
+    # def encode_key(self, key: BooleanArray):
+    #     k = str().join(str(k * 1) for k in key)
+    #     self._key_len = len(k)
+    #     return k
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -52,4 +53,4 @@ class DictRAM(RAM):
         return str(self)
 
     def size(self) -> int:
-        return len(self._addresses) * (self._key_len + 8)
+        return size_of_dict(self._addresses)

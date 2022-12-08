@@ -1,4 +1,7 @@
-from wisardlib.encoders.thermometer import ThermometerEncoder, DistributiveThermometerEncoder
+from wisardlib.encoders.thermometer import (
+    ThermometerEncoder,
+    DistributiveThermometerEncoder,
+)
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -8,26 +11,64 @@ import traceback
 
 from base import run_experiment, RAMConfig
 
-formatter = '[%(asctime)s] [%(levelname)s]: %(message)s'
+formatter = "[%(asctime)s] [%(levelname)s]: %(message)s"
 logging.basicConfig(format=formatter, level=logging.INFO)
 
 
 configs = [
     RAMConfig(name="DictRam", RAM_cls_name="dict"),
-
     # Bloom 1
-    RAMConfig(name="count-bloom", RAM_cls_name="count-bloom", RAM_cls_kwargs={"est_elements": 1000, "false_positive_rate": 0.05}),
-    RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 1000, "depth": 5}),
-    RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 1000, "bucket_size": 4}),
-    RAMConfig(name="heavy-hitters", RAM_cls_name="heavy-hitters", RAM_cls_kwargs={"num_hitters": 100, "width": 1000, "depth": 5}),
-    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 100, "width": 1000, "depth": 5}),
-
+    RAMConfig(
+        name="count-bloom",
+        RAM_cls_name="count-bloom",
+        RAM_cls_kwargs={"est_elements": 1000, "false_positive_rate": 0.05},
+    ),
+    RAMConfig(
+        name="count-min-sketch",
+        RAM_cls_name="count-min-sketch",
+        RAM_cls_kwargs={"width": 1000, "depth": 5},
+    ),
+    RAMConfig(
+        name="count-cuckoo",
+        RAM_cls_name="count-cuckoo",
+        RAM_cls_kwargs={"capacity": 1000, "bucket_size": 4},
+    ),
+    RAMConfig(
+        name="heavy-hitters",
+        RAM_cls_name="heavy-hitters",
+        RAM_cls_kwargs={"num_hitters": 100, "width": 1000, "depth": 5},
+    ),
+    RAMConfig(
+        name="stream-threshold",
+        RAM_cls_name="stream-threshold",
+        RAM_cls_kwargs={"threshold": 100, "width": 1000, "depth": 5},
+    ),
     # Bloom 2
-    RAMConfig(name="count-bloom", RAM_cls_name="count-bloom", RAM_cls_kwargs={"est_elements": 100, "false_positive_rate": 0.05}),
-    RAMConfig(name="count-min-sketch", RAM_cls_name="count-min-sketch", RAM_cls_kwargs={"width": 100, "depth": 5}),
-    RAMConfig(name="count-cuckoo", RAM_cls_name="count-cuckoo", RAM_cls_kwargs={"capacity": 100, "bucket_size": 4}),
-    RAMConfig(name="heavy-hitters", RAM_cls_name="heavy-hitters", RAM_cls_kwargs={"num_hitters": 50, "width": 100, "depth": 5}),
-    RAMConfig(name="stream-threshold", RAM_cls_name="stream-threshold", RAM_cls_kwargs={"threshold": 50, "width": 1000, "depth": 5}),
+    RAMConfig(
+        name="count-bloom",
+        RAM_cls_name="count-bloom",
+        RAM_cls_kwargs={"est_elements": 100, "false_positive_rate": 0.05},
+    ),
+    RAMConfig(
+        name="count-min-sketch",
+        RAM_cls_name="count-min-sketch",
+        RAM_cls_kwargs={"width": 100, "depth": 5},
+    ),
+    RAMConfig(
+        name="count-cuckoo",
+        RAM_cls_name="count-cuckoo",
+        RAM_cls_kwargs={"capacity": 100, "bucket_size": 4},
+    ),
+    RAMConfig(
+        name="heavy-hitters",
+        RAM_cls_name="heavy-hitters",
+        RAM_cls_kwargs={"num_hitters": 50, "width": 100, "depth": 5},
+    ),
+    RAMConfig(
+        name="stream-threshold",
+        RAM_cls_name="stream-threshold",
+        RAM_cls_kwargs={"threshold": 50, "width": 1000, "depth": 5},
+    ),
 ]
 
 # try:
@@ -71,7 +112,7 @@ try:
         encoder_kwargs={"resolution": 16},
         tuple_size=16,
         number_runs=3,
-        bleach=[2,5]
+        bleach=[2, 5],
     )
 except Exception as e:
     print(f"Error (exp3): {e}")

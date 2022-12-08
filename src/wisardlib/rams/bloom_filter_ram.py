@@ -5,10 +5,17 @@ import numpy as np
 import numba.core.types
 from numba.typed import Dict
 from typing import Hashable
-from probables import CountingBloomFilter, CountMinSketch, CountingCuckooFilter, HeavyHitters, StreamThreshold
+from probables import (
+    CountingBloomFilter,
+    CountMinSketch,
+    CountingCuckooFilter,
+    HeavyHitters,
+    StreamThreshold,
+)
 
 from .base import RAM
 from wisardlib.config.type_definitions import BooleanArray
+
 
 def size_of_bloom(filter) -> int:
     with tempfile.NamedTemporaryFile() as tmp:
@@ -18,16 +25,13 @@ def size_of_bloom(filter) -> int:
 
 
 class CountingBloomFilterRAM(RAM):
-    def __init__(
-        self,
-        est_elements: int = 1000,
-        false_positive_rate: float = 0.05
-    ):
+    def __init__(self, est_elements: int = 1000, false_positive_rate: float = 0.05):
         self.bloom_filter = CountingBloomFilter(
-            est_elements=est_elements, false_positive_rate=false_positive_rate)
+            est_elements=est_elements, false_positive_rate=false_positive_rate
+        )
 
-    def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+    # def encode_key(self, key: BooleanArray):
+    #     return str().join(str(k * 1) for k in key)
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -63,8 +67,8 @@ class CountMinSketchRAM(RAM):
             width=width, depth=depth, confidence=confidence, error_rate=soft_error_rate
         )
 
-    def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+    # def encode_key(self, key: BooleanArray):
+    #     return str().join(str(k * 1) for k in key)
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -100,8 +104,8 @@ class CountMinSketchRAM(RAM):
             width=width, depth=depth, confidence=confidence, error_rate=soft_error_rate
         )
 
-    def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+    # def encode_key(self, key: BooleanArray):
+    #     return str().join(str(k * 1) for k in key)
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -124,6 +128,7 @@ class CountMinSketchRAM(RAM):
     def size(self) -> int:
         return size_of_bloom(self.bloom_filter)
 
+
 class CountingCuckooRAM(RAM):
     def __init__(
         self,
@@ -142,8 +147,8 @@ class CountingCuckooRAM(RAM):
             finger_size=finger_size,
         )
 
-    def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+    # def encode_key(self, key: BooleanArray):
+    #     return str().join(str(k * 1) for k in key)
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -169,12 +174,7 @@ class CountingCuckooRAM(RAM):
 
 class HeavyHittersRAM(RAM):
     def __init__(
-        self,
-        num_hitters=100,
-        width=1000,
-        depth=5,
-        confidence=None,
-        error_rate=None
+        self, num_hitters=100, width=1000, depth=5, confidence=None, error_rate=None
     ):
         # print("Builiding HeavyHittersRAM...")
         self.bloom_filter = HeavyHitters(
@@ -182,11 +182,11 @@ class HeavyHittersRAM(RAM):
             width=width,
             depth=depth,
             confidence=confidence,
-            error_rate=error_rate
+            error_rate=error_rate,
         )
 
-    def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+    # def encode_key(self, key: BooleanArray):
+    #     return str().join(str(k * 1) for k in key)
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)
@@ -212,12 +212,7 @@ class HeavyHittersRAM(RAM):
 
 class StreamThresholdRAM(RAM):
     def __init__(
-        self,
-        threshold=100,
-        width=1000,
-        depth=5,
-        confidence=None,
-        error_rate=None
+        self, threshold=100, width=1000, depth=5, confidence=None, error_rate=None
     ):
         # print("Builiding HeavyHittersRAM...")
         self.bloom_filter = StreamThreshold(
@@ -225,11 +220,11 @@ class StreamThresholdRAM(RAM):
             width=width,
             depth=depth,
             confidence=confidence,
-            error_rate=error_rate
+            error_rate=error_rate,
         )
 
-    def encode_key(self, key: BooleanArray):
-        return str().join(str(k * 1) for k in key)
+    # def encode_key(self, key: BooleanArray):
+    #     return str().join(str(k * 1) for k in key)
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
         key = self.encode_key(key)

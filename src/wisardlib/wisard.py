@@ -26,6 +26,7 @@ class Discriminator:
         if true, count responses higher than bleach, else, return the responses
         (the default is True).
     """
+
     def __init__(
         self,
         rams: List[RAM],
@@ -226,6 +227,7 @@ class WiSARD:
         Use tqdm progress bar (the default is True).
 
     """
+
     def __init__(
         self,
         discriminators: List[Discriminator],
@@ -297,9 +299,7 @@ class WiSARD:
         return [indices[s] for s in slices]
 
     def __getitem__(self, key):
-        """Get the discriminator using the subscribed operator.
-
-        """
+        """Get the discriminator using the subscribed operator."""
         return self._discriminators[key]
 
     @property
@@ -333,9 +333,7 @@ class WiSARD:
 
     @property
     def indices(self):
-        """Get calculated indices.
-
-        """
+        """Get calculated indices."""
         return self._indices
 
     def _reindex_sample(self, x: BooleanArray) -> List[BooleanArray]:
@@ -413,7 +411,7 @@ class WiSARD:
             )
         # List with the responses of each disriminator per sample
         y_pred: List[np.ndarray] = []
-        #Iterate over samples
+        # Iterate over samples
         for i in it:
             # Reindex the input according to indices
             sample = self._reindex_sample(X[i])

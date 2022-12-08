@@ -59,6 +59,7 @@ class NestedThermometerEncoder(Encoder):
         dig_X = np.digitize(X - self.min_val, self.buckets)
         return self.thermometer.fit_transform(X)
 
+
 class DistributiveThermometerEncoder(ThermometerEncoder):
     def fit(self, X, y=None, **fit_args):
         self.min_val = np.min(X)
