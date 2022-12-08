@@ -1,2 +1,0 @@
-bleach,accuracy,f1 weighted,f1 macro,f1 micro,ties,run,train time,predict time,ram name,ram kwargs,tuple size,dataset name,encoder,encoder kwargs,experiment name,model size,train samples,test samples,classes,rams per discriminator,discriminators,seed,indices
-5,0.864696734059098,0.860582332198325,0.8358792529629042,0.864696734059098,221,1,6.869031667709351,12.613505840301514,DictRam,{},16,satimage,thermometer,"{""resolution"": 16}",test,157320,4501,1929,6,36,6,1670422316,576
