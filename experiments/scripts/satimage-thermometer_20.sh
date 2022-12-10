@@ -9,6 +9,6 @@ python experiments/normal_runner.py \
       --output-path "experiments/results" \
       --dataset satimage \
       --encoder thermometer --resolution 20 \
-      --tuple-size 16 \
+      --tuple-size 20 \
       --runs 3 \
-      --bleach 20
+      --bleach 5

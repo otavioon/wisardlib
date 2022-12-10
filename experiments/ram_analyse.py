@@ -131,27 +131,36 @@ def run_experiment(
         model.fit(x_train, y_train)
         models.append(model)
 
-    for i, model in enumerate(models):
-        logging.info(f"Setting bleach to: {bleach}")
-        models[0].bleach = bleach
-        y_pred = models[0].predict(x_test)
-        y_pred, ties = untie_by_first_class(y_pred)
-        acc = accuracy_score(y_test, y_pred)
-        f1_macro = f1_score(y_test, y_pred, average="macro")
-        f1_micro = f1_score(y_test, y_pred, average="micro")
-        f1_weighted = f1_score(y_test, y_pred, average="weighted")
-        logging.info(
-            f"[model {i}] Accuracy: {acc:.3f}, f1-score (weighted): {f1_weighted:.3f}, ties: {ties}"
-        )
+    base_model = models[0]
+    for c_no in range(n_classes):
+        discriminator = base_model[c_no]
+        n_addresses = []
+        for r_no in range(n_rams):
+            ram = discriminator[r_no]
+            n_addresses.append(len(ram._addresses))
+        print(f"D[{c_no}]: {(n_addresses)} ({np.mean(n_addresses)/2**tuple_size})")
 
-    for i, other_model in enumerate(models[1:]):
-        print(f"----------Model {i+1} vs 0 -----------------")
-        for y in range(n_classes):
-            print(f"===== Class: {y}")
-            inspect_models(
-                models[0], other_model, tuple_size=tuple_size, n_rams=n_rams, y=y
-            )
-        print()
+    # for i, model in enumerate(models):
+    #     logging.info(f"Setting bleach to: {bleach}")
+    #     models[0].bleach = bleach
+    #     y_pred = models[0].predict(x_test)
+    #     y_pred, ties = untie_by_first_class(y_pred)
+    #     acc = accuracy_score(y_test, y_pred)
+    #     f1_macro = f1_score(y_test, y_pred, average="macro")
+    #     f1_micro = f1_score(y_test, y_pred, average="micro")
+    #     f1_weighted = f1_score(y_test, y_pred, average="weighted")
+    #     logging.info(
+    #         f"[model {i}] Accuracy: {acc:.3f}, f1-score (weighted): {f1_weighted:.3f}, ties: {ties}"
+    #     )
+    #
+    # for i, other_model in enumerate(models[1:]):
+    #     print(f"----------Model {i+1} vs 0 -----------------")
+    #     for y in range(n_classes):
+    #         print(f"===== Class: {y}")
+    #         inspect_models(
+    #             models[0], other_model, tuple_size=tuple_size, n_rams=n_rams, y=y
+    #         )
+    #     print()
 
 
 if __name__ == "__main__":

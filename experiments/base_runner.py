@@ -39,15 +39,18 @@ rams = {
 }
 
 datasets = {
-    "iris": {"path": Path("data/iris/data.pkl")},
-    "wine": {"path": Path("data/wine/data.pkl")},  # Z
-    "breast_cancer": {"path": Path("data/breast_cancer/data.pkl")},  # Z
-    "ecoli": {"path": Path("data/ecoli/data.pkl")},  # NF
-    "letter": {"path": Path("data/letter/data.pkl")},
-    "satimage": {"path": Path("data/satimage/data.pkl")},
-    "segment": {"path": Path("data/segment/data.pkl")},
-    "glass": {"path": Path("data/glass/data.pkl")},
-    "mnist": {"path": Path("data/mnist/data.pkl")},
+    "iris": {"path": Path("experiments/data/iris/data.pkl")}, # OK
+    "wine": {"path": Path("experiments/data/wine/data.pkl")},  # OK
+    "breast_cancer": {"path": Path("experiments/data/breast_cancer/data.pkl")},  # OK
+    "ecoli": {"path": Path("experiments/data/ecoli/data.pkl")},  #
+    "letter": {"path": Path("experiments/data/letter/data.pkl")}, # OK
+    "satimage": {"path": Path("experiments/data/satimage/data.pkl")}, # OK
+    "segment": {"path": Path("experiments/data/segment/data.pkl")}, #~OK
+    "glass": {"path": Path("experiments/data/glass/data.pkl")}, # OK
+    "mnist": {"path": Path("experiments/data/mnist/data.pkl")}, # OK
+    "vehicle": {"path": Path("experiments/data/vehicle/data.pkl")}, # OK
+    "motion_sense": {"path": Path("experiments/data/motion_sense/data.pkl")}, # OK
+    "sensorless_drive": {"path": Path("experiments/data/sensorless_drive/data.pkl")}, # OK
 }
 
 
