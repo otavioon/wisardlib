@@ -39,3 +39,8 @@ class RAM:
 
     def size(self):
         raise NotImplementedError
+
+
+class JoinableRAM(RAM):
+    def join(self, other: "JoinableRAM"):
+        raise NotImplementedError

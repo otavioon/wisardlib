@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import numba.core.types
 from numba.typed import Dict
-from .base import RAM
+from .base import JoinableRAM
 from typing import Hashable
 
 
@@ -19,7 +19,7 @@ def size_of_dict(numba_dict) -> int:
         return Path(tmp.name).stat().st_size
 
 
-class DictRAM(RAM):
+class DictRAM(JoinableRAM):
     def __init__(self):
         self._addresses = Dict.empty(
             key_type=numba.core.types.string, value_type=numba.core.types.int64
@@ -37,6 +37,10 @@ class DictRAM(RAM):
             self._addresses[key] = inc_val
         else:
             self._addresses[key] += inc_val
+
+    def join(self, other: "DictRAM"):
+        for key, value in other._addresses.items():
+            self._addresses[key] = self._addresses.get(key, 0) + value
 
     def __contains__(self, key: BooleanArray):
         key = self.encode_key(key)

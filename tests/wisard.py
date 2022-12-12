@@ -21,9 +21,65 @@ def test_dict_ram():
         ram.add_member(sample)
 
     assert ram[samples[0]] == 2
+    assert ram[samples[2]] == 1
     assert samples[0] in ram
     assert ram[np.array([True])] == 0
     assert np.array([True]) not in ram
+
+
+def test_dict_ram_join():
+    rams = [DictRAM(), DictRAM()]
+    samples = np.array(
+        [
+            [False, False, True],
+            [False, False, True],
+            [True, True, True],
+        ],
+        dtype=bool,
+    )
+    for sample in samples:
+        rams[0].add_member(sample)
+        rams[1].add_member(sample)
+
+    rams[0].join(rams[1])
+
+    assert rams[0][samples[0]] == 2*2
+    assert rams[0][samples[2]] == 1*2
+    assert samples[0] in rams[0]
+    assert rams[0][np.array([True])] == 0
+    assert np.array([True]) not in rams[0]
+
+def test_dict_ram_join_2():
+    rams = [DictRAM(), DictRAM()]
+    samples_0 = np.array(
+        [
+            [False, False, True],
+            [False, False, True],
+            [True, True, True],
+        ],
+        dtype=bool,
+    )
+
+    samples_1 = np.array(
+        [
+            [False, False, False],
+            [False, False, True],
+            [True, True, True],
+        ],
+        dtype=bool,
+    )
+
+    for sample in samples_0:
+        rams[0].add_member(sample)
+    for sample in samples_1:
+        rams[1].add_member(sample)
+
+    rams[0].join(rams[1])
+
+    assert rams[0][samples_1[0]] == 1
+    assert rams[0][samples_1[1]] == 3
+    assert rams[0][samples_1[2]] == 2
+    assert np.array([True]) not in rams[0]
 
 
 def test_dict_ram_discriminator():
@@ -49,6 +105,40 @@ def test_dict_ram_discriminator_fit_predict():
     sample_2d = [np.array([True, True, True]), np.array([False, False, False])]
     results = d.predict(sample_2d)
     assert results == 0
+
+
+def test_dict_ram_discriminator_join():
+    ds = [
+        Discriminator([DictRAM(), DictRAM()]),
+        Discriminator([DictRAM(), DictRAM()]),
+    ]
+    sample_2d = [np.array([False, False, False]), np.array([True, True, True])]
+    other_sample_2d = [np.array([True, False, True]), np.array([True, False, True])]
+    ds[0].fit(sample_2d)
+    ds[1].fit(sample_2d)
+    ds[1].fit(other_sample_2d)
+
+    # On sample
+    results = ds[0].predict(sample_2d)
+    assert results == 2
+
+    # 1 wrong
+    sample_2d = [np.array([False, False, False]), np.array([False, False, False])]
+    results = ds[0].predict(sample_2d)
+    assert results == 1
+
+    # All wrong
+    sample_2d = [np.array([True, False, True]), np.array([False, True, False])]
+    results = ds[0].predict(sample_2d)
+    assert results == 0
+
+    # join
+    ds[0].join(ds[1])
+
+    # now 1 wrong
+    sample_2d = [np.array([True, False, True]), np.array([False, True, False])]
+    results = ds[0].predict(sample_2d)
+    assert results == 1
 
 
 def test_dict_ram_discriminator_bleach():

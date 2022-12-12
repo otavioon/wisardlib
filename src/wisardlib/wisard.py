@@ -168,6 +168,10 @@ class Discriminator:
         else:
             raise TypeError("Bleach must be a list of real numbers or real number")
 
+    def join(self, other: "Discriminator"):
+        for r, other_r in zip(self._rams, other._rams):
+            r.join(other_r)
+
     def __getitem__(self, key) -> RAM:
         """Get a single RAM with python's subscribed operator.
 
@@ -419,6 +423,13 @@ class WiSARD:
             responses = np.array([d.predict(sample) for d in self._discriminators])
             y_pred.append(responses)  # np.where(responses == responses.max())[0])
         return np.array(y_pred)
+
+    def join(self, other: "WiSARD"):
+        for d, other_d in zip(self._discriminators, other._discriminators):
+            d.join(other_d)
+
+    def __len__(self) -> int:
+        return len(self._discriminators)
 
     def __str__(self) -> str:
         return f"WiSARD with {len(self._discriminators)} discriminators."
