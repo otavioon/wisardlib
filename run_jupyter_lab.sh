@@ -1,0 +1,1 @@
+podman run -it --rm -v /home/lopani/Doutorado/ISCTE/wisard:/home/lopani/Doutorado/ISCTE/wisard -w /home/lopani/Doutorado/ISCTE/wisard --network host localhost/wisard-image:latest jupyter-lab --allow-root

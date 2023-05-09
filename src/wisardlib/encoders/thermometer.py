@@ -39,12 +39,13 @@ class ThermometerEncoder(Encoder):
 
 
 class NestedThermometerEncoder(Encoder):
-    def __init__(self, resolution: int, resolution_2: int):
+    def __init__(self, resolution: int, resolution_2: int, shuffle: bool = True):
         self.resolution = resolution
         self.resolution_2 = resolution_2
         self.thermometer = ThermometerEncoder(resolution_2)
         self.min_val = None
         self.buckets = []
+        self.shuffle = shuffle
 
     def fit(self, X, y=None, **fit_args):
         self.min_val = np.min(X)
@@ -57,7 +58,9 @@ class NestedThermometerEncoder(Encoder):
 
     def transform(self, X: np.ndarray):
         dig_X = np.digitize(X - self.min_val, self.buckets)
-        return self.thermometer.fit_transform(X)
+        if self.shuffle:
+            np.random.shuffle(dig_X)
+        return self.thermometer.fit(dig_X).transform(dig_X)
 
 
 class DistributiveThermometerEncoder(ThermometerEncoder):

@@ -10,5 +10,6 @@ python experiments/normal_runner.py \
       --dataset wine \
       --encoder distributive-thermometer --resolution 16 \
       --tuple-size 16 \
-      --runs 3 \
-      --bleach 2 5 8 10 15
+      --runs 1 \
+      --bleach 2
+      

@@ -18,6 +18,8 @@ def size_of_dict(numba_dict) -> int:
         tmp.flush()
         return Path(tmp.name).stat().st_size
 
+# x = 0
+# f = open("file.out", "w")
 
 class DictRAM(JoinableRAM):
     def __init__(self):
@@ -32,11 +34,17 @@ class DictRAM(JoinableRAM):
     #     return k
 
     def add_member(self, key: BooleanArray, inc_val: int = 1):
+        global x, f
         key = self.encode_key(key)
         if key not in self._addresses:
             self._addresses[key] = inc_val
         else:
             self._addresses[key] += inc_val
+
+        # f.write(f"{x}: {len(self._addresses) / 2**len(key)} \n")
+        # f.write(str(len(self._addresses) / 2**len(key)) + "\n")
+        # print(x, len(self._addresses) / 2**len(key))
+        # x += 1
 
     def join(self, other: "DictRAM"):
         for key, value in other._addresses.items():

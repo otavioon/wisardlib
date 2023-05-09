@@ -146,6 +146,8 @@ def run_experiment(
             model.fit(x_train, y_train)
             train_end = time.time()
 
+            print(str(model[0]))
+
             for bleach_val in bleach:
                 logging.info(f"Setting bleach to: {bleach_val}")
                 model.bleach = bleach_val

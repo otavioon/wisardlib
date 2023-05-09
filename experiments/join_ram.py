@@ -28,7 +28,7 @@ from base_runner import (
 
 configs = [
     #Dict RAM
-    RAMConfig(name="DictRam", RAM_cls_name="count-bloom"),
+    RAMConfig(name="DictRam", RAM_cls_name="dict"),
 
     RAMConfig(
         name="count-bloom",

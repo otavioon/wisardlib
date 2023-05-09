@@ -12,7 +12,7 @@ class Encoder:
         raise NotImplementedError
 
     def fit_transform(self, X: np.ndarray, y=None, **fit_args) -> BooleanArray:
-        return fit(X, y, **fit_args)
+        return fit(X, y, **fit_args).transform(X)
 
 
 class EncoderDecoder(Encoder):
