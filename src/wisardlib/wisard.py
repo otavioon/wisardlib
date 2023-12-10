@@ -388,8 +388,7 @@ class WiSARD:
         for i in it:
             # Transform each input as a list of subsamples (based on indices)
             sample = self._reindex_sample(X[i])
-            if y[i] == 1:
-                self._discriminators[y[i]].fit(sample)
+            self._discriminators[y[i]].fit(sample)
         return self
 
     def predict(self, X: BooleanArray) -> np.ndarray:

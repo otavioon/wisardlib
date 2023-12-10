@@ -89,3 +89,4 @@ venv.bak/
 # My virtual environments
 .wisard-venv/
 
+experiments/results/*.pdf
