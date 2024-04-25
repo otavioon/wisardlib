@@ -1,0 +1,182 @@
+{
+    "breast_cancer": {
+        "name": "breast_cancer",
+        "size": 141416,
+        "features": 30,
+        "num_classes": 3,
+        "train_size": 398,
+        "test_size": 171,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "dry_bean": {
+        "name": "dry_bean",
+        "size": 1773910,
+        "features": 16,
+        "num_classes": 7,
+        "train_size": 10888,
+        "test_size": 2723,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "glass": {
+        "name": "glass",
+        "size": 17413,
+        "features": 9,
+        "num_classes": 24,
+        "train_size": 149,
+        "test_size": 65,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "image_segmentation": {
+        "name": "image_segmentation",
+        "size": 32678,
+        "features": 19,
+        "num_classes": 7,
+        "train_size": 168,
+        "test_size": 42,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "iris": {
+        "name": "iris",
+        "size": 10389,
+        "features": 4,
+        "num_classes": 3,
+        "train_size": 105,
+        "test_size": 45,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "letter": {
+        "name": "letter",
+        "size": 2724386,
+        "features": 16,
+        "num_classes": 26,
+        "train_size": 14000,
+        "test_size": 6000,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "mnist": {
+        "name": "mnist",
+        "size": 54954381,
+        "features": 784,
+        "num_classes": 10,
+        "train_size": 60000,
+        "test_size": 10000,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "motion_sense": {
+        "name": "motion_sense",
+        "size": 12809805,
+        "features": 360,
+        "num_classes": 6,
+        "train_size": 3414,
+        "test_size": 1020,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "olivetti": {
+        "name": "olivetti",
+        "size": 7966604,
+        "features": 4096,
+        "num_classes": 40,
+        "train_size": 320,
+        "test_size": 80,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "optical_handwritten": {
+        "name": "optical_handwritten",
+        "size": 2926777,
+        "features": 64,
+        "num_classes": 10,
+        "train_size": 4496,
+        "test_size": 1124,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "rice": {
+        "name": "rice",
+        "size": 225402,
+        "features": 7,
+        "num_classes": 2,
+        "train_size": 3078,
+        "test_size": 762,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "satimage": {
+        "name": "satimage",
+        "size": 1907691,
+        "features": 36,
+        "num_classes": 6,
+        "train_size": 4501,
+        "test_size": 1929,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "segment": {
+        "name": "segment",
+        "size": 374011,
+        "features": 19,
+        "num_classes": 7,
+        "train_size": 1617,
+        "test_size": 693,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "sensorless_drive": {
+        "name": "sensorless_drive",
+        "size": 22935861,
+        "features": 48,
+        "num_classes": 11,
+        "train_size": 46807,
+        "test_size": 11702,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "sepsis": {
+        "name": "sepsis",
+        "size": 3535311,
+        "features": 3,
+        "num_classes": 2,
+        "train_size": 88272,
+        "test_size": 22069,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "vehicle": {
+        "name": "vehicle",
+        "size": 132992,
+        "features": 18,
+        "num_classes": 3,
+        "train_size": 676,
+        "test_size": 170,
+        "balanced": true,
+        "metric": "accuracy"
+    },
+    "wine": {
+        "name": "wine",
+        "size": 24325,
+        "features": 13,
+        "num_classes": 3,
+        "train_size": 124,
+        "test_size": 54,
+        "balanced": false,
+        "metric": "f1 weighted"
+    },
+    "yeast": {
+        "name": "yeast",
+        "size": 102386,
+        "features": 8,
+        "num_classes": 10,
+        "train_size": 1187,
+        "test_size": 297,
+        "balanced": false,
+        "metric": "f1 weighted"
+    }
+}
