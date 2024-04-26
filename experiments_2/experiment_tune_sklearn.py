@@ -14,22 +14,18 @@ from ray.train import RunConfig
 from ray.tune import TuneConfig
 from datetime import datetime
 
+from dataclasses import dataclass, field
 from sklearn.model_selection import train_test_split
 
-from wisardlib.encoders.thermometer import (
-    ThermometerEncoder,
-    DistributiveThermometerEncoder,
-)
-from wisardlib.rams.dict_ram import DictRAM
-from wisardlib.rams.bloom_filter_ram import (
-    CountingBloomFilterRAM,
-    CountMinSketchRAM,
-    CountMeanSketchRAM,
-    CountMeanMinSketchRAM,
-    CountingCuckooRAM,
-    HeavyHittersRAM,
-    StreamThresholdRAM,
-)
+from sklearn.metrics import accuracy_score, f1_score
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neural_network import MLPClassifier
 from ray.tune.search import ConcurrencyLimiter
 
 from wisardlib.builder import build_symmetric_wisard
@@ -39,23 +35,25 @@ from time import perf_counter
 
 from ray import tune
 from ray.train import FailureConfig
+import pickle
 
-
-encoders_cls = {
-    "thermometer": ThermometerEncoder,
-    "distributive-thermometer": DistributiveThermometerEncoder,
+classifiers = {
+    "random-forest": RandomForestClassifier,
+    "knn": KNeighborsClassifier,
+    "svm": SVC,
+    "mlp": MLPClassifier,
+    "mlp-2": MLPClassifier,
 }
 
-rams_cls = {
-    "dict": DictRAM,
-    "count-bloom": CountingBloomFilterRAM,
-    "count-min-sketch": CountMinSketchRAM,
-    "count-mean-sketch": CountMeanSketchRAM,
-    "count-mean-min-sketch": CountMeanMinSketchRAM,
-    "heavy-hitters": HeavyHittersRAM,
-    "stream-threshold": StreamThresholdRAM,
-    "count-cuckoo": CountingCuckooRAM,
-}
+
+@dataclass
+class ClassifierConfig:
+    name: str
+    params: dict = field(default_factory=dict)
+    
+def get_model_size(model):
+    return len(pickle.dumps(model))
+
 
 datasets = {
     "iris_fold_0": {"path": Path("iris_fold_0/data.pkl")},
@@ -106,12 +104,6 @@ datasets = {
     "glass_fold_3": {"path": Path("glass_fold_3/data.pkl")},
     "glass_fold_4": {"path": Path("glass_fold_4/data.pkl")},
     
-    # "mnist_fold_0": {"path": Path("mnist_fold_0/data.pkl")},
-    # "mnist_fold_1": {"path": Path("mnist_fold_1/data.pkl")},
-    # "mnist_fold_2": {"path": Path("mnist_fold_2/data.pkl")},
-    # "mnist_fold_3": {"path": Path("mnist_fold_3/data.pkl")},
-    # "mnist_fold_4": {"path": Path("mnist_fold_4/data.pkl")},
-    
     "vehicle_fold_0": {"path": Path("vehicle_fold_0/data.pkl")},
     "vehicle_fold_1": {"path": Path("vehicle_fold_1/data.pkl")},
     "vehicle_fold_2": {"path": Path("vehicle_fold_2/data.pkl")},
@@ -123,12 +115,6 @@ datasets = {
     "motion_sense_fold_2": {"path": Path("motion_sense_fold_2/data.pkl")},
     "motion_sense_fold_3": {"path": Path("motion_sense_fold_3/data.pkl")},
     "motion_sense_fold_4": {"path": Path("motion_sense_fold_4/data.pkl")},
-    
-    # "sensorless_drive_fold_0": {"path": Path("sensorless_drive_fold_0/data.pkl")},
-    # "sensorless_drive_fold_1": {"path": Path("sensorless_drive_fold_1/data.pkl")},
-    # "sensorless_drive_fold_2": {"path": Path("sensorless_drive_fold_2/data.pkl")},
-    # "sensorless_drive_fold_3": {"path": Path("sensorless_drive_fold_3/data.pkl")},
-    # "sensorless_drive_fold_4": {"path": Path("sensorless_drive_fold_4/data.pkl")},
     
     "optical_handwritten_fold_0": {"path": Path("optical_handwritten_fold_0/data.pkl")},
     "optical_handwritten_fold_1": {"path": Path("optical_handwritten_fold_1/data.pkl")},
@@ -165,12 +151,6 @@ datasets = {
     "dry_bean_fold_2": {"path": Path("dry_bean_fold_2/data.pkl")},
     "dry_bean_fold_3": {"path": Path("dry_bean_fold_3/data.pkl")},
     "dry_bean_fold_4": {"path": Path("dry_bean_fold_4/data.pkl")},
-    
-    # "olivetti_fold_0": {"path": Path("olivetti_fold_0/data.pkl")},
-    # "olivetti_fold_1": {"path": Path("olivetti_fold_1/data.pkl")},
-    # "olivetti_fold_2": {"path": Path("olivetti_fold_2/data.pkl")},
-    # "olivetti_fold_3": {"path": Path("olivetti_fold_3/data.pkl")},
-    # "olivetti_fold_4": {"path": Path("olivetti_fold_4/data.pkl")},
 }
 
 
@@ -196,8 +176,8 @@ class Timer:
 
 
 
-class BaseEperiment(tune.Trainable):
-    RAM_name = ""
+class BaseExperiment(tune.Trainable):
+    MODEL_name = ""
 
     @staticmethod
     def get_search_space():
@@ -206,22 +186,16 @@ class BaseEperiment(tune.Trainable):
     def _get_ram_config(self, config: Dict) -> Dict:
         raise NotImplementedError
 
-    def _get_metrics(self, metrics, y_pred, y_true, ties, stage: str):
-        metrics["ties"].append(ties)
+    def _get_metrics(self, metrics, y_pred, y_true, stage: str):
         metrics["accuracy"].append(
             accuracy_score(y_true, y_pred),
         )
         metrics["f1 weighted"].append(
             f1_score(y_true, y_pred, average="weighted")
         )     
-        metrics["size"].append(self.model.size())
+        metrics["size"].append(get_model_size(self.model))
 
         result = {
-            # Ties
-            f"{stage}_ties": ties,
-            f"{stage}_ties_mean": np.mean(metrics["ties"]),
-            f"{stage}_ties_std": np.std(metrics["ties"]),
-            
             # Accuracy
             f"{stage}_accuracy": metrics["accuracy"][-1],
             f"{stage}_accuracy_mean": np.mean(np.array(metrics["accuracy"])),
@@ -242,18 +216,17 @@ class BaseEperiment(tune.Trainable):
         
         return result
 
+    # vars:
+    # root_data_dir: Path
+    # dataset_name: str
+
     def setup(self, config):
         self.val_metrics = defaultdict(list)
         self.test_metrics = defaultdict(list)
 
         self.root_data_dir = Path(config["root_data_dir"])
         self.dataset_name = config["dataset_name"]
-        self.tuple_size = (
-            config["resolution"] // config["tuple_resolution_factor"]
-        )
-        self.encoder_name = config["encoder"]
-        self.encoder_kwargs = {"resolution": config["resolution"]}
-        self.encoder = encoders_cls[self.encoder_name](**self.encoder_kwargs)
+        self.model_config = self._get_config(config)
 
         (self.x_train, self.y_train), (self.x_test, self.y_test) = load_dataset(
             self.dataset_name, self.root_data_dir
@@ -267,83 +240,53 @@ class BaseEperiment(tune.Trainable):
             stratify=self.y_train,
         )
 
-        # Fit encoder on train data
-        self.encoder.fit(self.x_train)
         # Transform data
-        self.x_train = [x.ravel() for x in self.encoder.transform(self.x_train)]
-        self.x_val = [x.ravel() for x in self.encoder.transform(self.x_val)]
-        self.x_test = [x.ravel() for x in self.encoder.transform(self.x_test)]
+        self.x_train = self.x_train.reshape(self.x_train.shape[0], -1)
+        self.x_val = self.x_val.reshape(self.x_val.shape[0], -1)
+        self.x_test = self.x_test.reshape(self.x_test.shape[0], -1)
+        # Discretize labels
         self.y_train = discretize_labels(self.y_train)
         self.y_val = discretize_labels(self.y_val)
         self.y_test = discretize_labels(self.y_test)
         # Indices and classes
-        self.indices = len(self.x_train[0].ravel())
         self.n_classes = max(self.y_train) + 1
-        # RAM
-        self.ram_cls = rams_cls[self.RAM_name]
-        self.ram_kwargs = self._get_ram_config(config)
-        # Other parameters
-        self.bleach = config["bleach"]
-        self.number_of_rams_per_discriminator = self.indices // self.tuple_size
+        
 
     def step(self):
-        self.model = build_symmetric_wisard(
-            RAM_cls=self.ram_cls,
-            RAM_creation_kwargs=self.ram_kwargs,
-            number_of_rams_per_discriminator=self.number_of_rams_per_discriminator,
-            number_of_discriminators=self.n_classes,
-            indices=self.indices,
-            tuple_size=self.tuple_size,
-            shuffle_indices=True,
-            use_tqdm=False,
-        )
-
-        # Fit model on train data
+        self.model_cls = classifiers[self.MODEL_name]
+        self.model = self.model_cls(**self.model_config)
+        
         with Timer() as t_train_time:
             self.model.fit(self.x_train, self.y_train)
 
-        # Predict with validation data
-        self.model.bleach = self.bleach
-        
         with Timer() as t_val_predict_time:
             y_pred = self.model.predict(self.x_val)
-            y_pred, ties = untie_by_first_class(y_pred, use_tqdm=False)
             
         metrics = self._get_metrics(
             metrics=self.val_metrics,
             y_pred=y_pred,
             y_true=self.y_val,
-            ties=ties,
             stage="val",
         )
-        metrics["ram"] = self.RAM_name
+        
         metrics["train time"] = t_train_time.time
         metrics["val_predict time"] = t_val_predict_time.time
         metrics["train_samples"] = len(self.x_train)
         metrics["val_samples"] = len(self.x_val)
         metrics["test_samples"] = len(self.x_test)
         metrics["classes"] = self.n_classes
-        metrics["rams per discriminator"] = self.number_of_rams_per_discriminator
-        metrics["discriminators"] = self.n_classes
-        metrics["indices"] = self.indices
         
-        # Add validation samples
-        self.model.fit(self.x_val, self.y_val)
         
-        # Predict with test data
-        self.model.bleach = self.bleach
         with Timer() as t_test_predict_time:
             y_pred = self.model.predict(self.x_test)
-            y_pred, ties = untie_by_first_class(y_pred, use_tqdm=False)
             
         test_metrics = self._get_metrics(
             metrics=self.test_metrics,
             y_pred=y_pred,
             y_true=self.y_test,
-            ties=ties,
             stage="test",
         )
-        
+            
         metrics.update(test_metrics)
         metrics["test_predict time"] = t_test_predict_time.time
         return metrics
@@ -358,155 +301,130 @@ class BaseEperiment(tune.Trainable):
         pass
 
 
-class DictExperiment(BaseEperiment):
-    RAM_name = "dict"
-
-    @staticmethod
-    def get_search_space():
-        return {}
-
-    def _get_ram_config(self, config: Dict) -> Dict:
-        return {}
-
-
-class CountingBloomFilterExperiment(BaseEperiment):
-    RAM_name = "count-bloom"
-
-    def _get_ram_config(self, config: Dict) -> Dict:
+class RandomForestExperiment(BaseExperiment):
+    MODEL_name = "random-forest"
+    
+    def _get_config(self, config: Dict) -> Dict:
         return {
-            "est_elements": config["est_elements"],
-            "false_positive_rate": config["false_positive_rate"],
+            "n_estimators": config["n_estimators"],
+            "max_depth": config["max_depth"],
         }
-
+    
     @staticmethod
     def get_search_space():
         return {
-            "est_elements": optuna.distributions.IntDistribution(
-                10, 1000, log=False, step=10
-            ),
-            "false_positive_rate": optuna.distributions.FloatDistribution(
-                0.01, 0.9, log=True
-            ),
+            "n_estimators": optuna.distributions.IntDistribution(10, 1000),
+            "max_depth": optuna.distributions.IntDistribution(1, 100),
         }
 
-
-class CountMinSketchExperiment(BaseEperiment):
-    RAM_name = "count-min-sketch"
-
-    def _get_ram_config(self, config: Dict) -> Dict:
-        return {"width": config["width"], "depth": config["depth"]}
-
+class KNNExperiment(BaseExperiment):
+    MODEL_name = "knn"
+    
     @staticmethod
     def get_search_space():
         return {
-            "width": optuna.distributions.IntDistribution(
-                1, 500, log=False, step=3
-            ),
-            "depth": optuna.distributions.IntDistribution(1, 5),
+            "n_neighbors": optuna.distributions.IntDistribution(1, 100),
+            "weights": optuna.distributions.CategoricalDistribution(["uniform", "distance"]),
+            "algorithm": optuna.distributions.CategoricalDistribution(["auto", "ball_tree", "kd_tree", "brute"]),
         }
-
-
-class CountMeanSketchExperiment(CountMinSketchExperiment):
-    RAM_name = "count-mean-sketch"
-
-
-class CountMeanMinSketchExperiment(CountMinSketchExperiment):
-    RAM_name = "count-mean-min-sketch"
-
-
-class CountingCuckooExperiment(BaseEperiment):
-    RAM_name = "count-cuckoo"
-
-    def _get_ram_config(self, config: Dict) -> Dict:
+        
+    def _get_config(self, config: Dict) -> Dict:
         return {
-            "capacity": config["capacity"],
-            "bucket_size": config["bucket_size"],
+            "n_neighbors": config["n_neighbors"],
+            "weights": config["weights"],
+            "algorithm": config["algorithm"],
         }
-
+    
+    
+class SVMExperiment(BaseExperiment):
+    MODEL_name = "svm"
+    
     @staticmethod
     def get_search_space():
         return {
-            "capacity": optuna.distributions.IntDistribution(
-                10, 1000, log=False, step=10
-            ),
-            "bucket_size": optuna.distributions.IntDistribution(1, 10),
+            "C": optuna.distributions.FloatDistribution(0.1, 1000),
+            "kernel": optuna.distributions.CategoricalDistribution(["linear", "poly", "rbf", "sigmoid"]),
+            "degree": optuna.distributions.IntDistribution(1, 10),
+            "gamma": optuna.distributions.CategoricalDistribution(["scale", "auto"]),
         }
-
-
-class HeavyHittersExperiment(BaseEperiment):
-    RAM_name = "heavy-hitters"
-
-    def _get_ram_config(self, config: Dict) -> Dict:
+        
+    def _get_config(self, config: Dict) -> Dict:
         return {
-            "num_hitters": config["num_hitters"],
-            "width": config["width"],
-            "depth": config["depth"],
+            "C": config["C"],
+            "kernel": config["kernel"],
+            "degree": config["degree"],
+            "gamma": config["gamma"],
         }
 
+class MLPExperiment(BaseExperiment):
+    MODEL_name = "mlp-2"
+    
     @staticmethod
     def get_search_space():
         return {
-            "num_hitters": optuna.distributions.IntDistribution(
-                5, 1000, log=False, step=5
-            ),
-            "width": optuna.distributions.IntDistribution(
-                1, 500, log=False, step=3
-            ),
-            "depth": optuna.distributions.IntDistribution(1, 5),
+            "hidden_layer_sizes": optuna.distributions.IntDistribution(1, 300),
+            "activation": optuna.distributions.CategoricalDistribution(["logistic", "tanh", "relu"]),
+            "solver": optuna.distributions.CategoricalDistribution(["lbfgs", "sgd", "adam"]),
+            "alpha": optuna.distributions.FloatDistribution(0.0001, 0.1),
+            "learning_rate": optuna.distributions.CategoricalDistribution(["constant", "invscaling", "adaptive"]),
         }
-
-
-class StreamThresholdExperiment(BaseEperiment):
-    RAM_name = "stream-threshold"
-
-    def _get_ram_config(self, config: Dict) -> Dict:
+        
+    def _get_config(self, config: Dict) -> Dict:
         return {
-            "threshold": config["threshold"],
-            "width": config["width"],
-            "depth": config["depth"],
+            "hidden_layer_sizes": (config["hidden_layer_sizes"], ),
+            "activation": config["activation"],
+            "solver": config["solver"],
+            "alpha": config["alpha"],
+            "learning_rate": config["learning_rate"],
         }
 
+
+class MLP2Experiment(BaseExperiment):
+    MODEL_name = "mlp"
+    
     @staticmethod
     def get_search_space():
         return {
-            "threshold": optuna.distributions.IntDistribution(
-                5, 1000, log=False, step=5
-            ),
-            "width": optuna.distributions.IntDistribution(
-                1, 500, log=False, step=3
-            ),
-            "depth": optuna.distributions.IntDistribution(1, 5),
+            "hidden_layer_sizes_1": optuna.distributions.IntDistribution(1, 300),
+            "hidden_layer_sizes_2": optuna.distributions.IntDistribution(1, 300),
+            "activation": optuna.distributions.CategoricalDistribution(["logistic", "tanh", "relu"]),
+            "solver": optuna.distributions.CategoricalDistribution(["lbfgs", "sgd", "adam"]),
+            "alpha": optuna.distributions.FloatDistribution(0.0001, 0.1),
+            "learning_rate": optuna.distributions.CategoricalDistribution(["constant", "invscaling", "adaptive"]),
+        }
+        
+    def _get_config(self, config: Dict) -> Dict:
+        return {
+            "hidden_layer_sizes": (config["hidden_layer_sizes_1"], config["hidden_layer_sizes_2"]),
+            "activation": config["activation"],
+            "solver": config["solver"],
+            "alpha": config["alpha"],
+            "learning_rate": config["learning_rate"],
         }
 
+    
 
 def main(
     dataset: str,
-    ram: str,
+    model: str,
     root_data_dir: Path,
     metric: str,
     output_dir: Path,
     experiment_name: str,
-    resolution_min: int,
-    resolution_max: int,
-    bleach_min: int,
-    bleach_max: int,
     cpus: int,
     budget: int,
     num_samples: int = 10000,
     concurrent_trials: int = None,
 ):
     experiment_map = {
-        "dict": DictExperiment,
-        "count-bloom": CountingBloomFilterExperiment,
-        "count-min-sketch": CountMinSketchExperiment,
-        "count-mean-sketch": CountMeanSketchExperiment,
-        "count-mean-min-sketch": CountMeanMinSketchExperiment,
-        "heavy-hitters": HeavyHittersExperiment,
-        "stream-threshold": StreamThresholdExperiment,
-        "count-cuckoo": CountingCuckooExperiment,
+        "random-forest": RandomForestExperiment,
+        "knn": KNNExperiment,
+        "svm": SVMExperiment,
+        "mlp": MLPExperiment,
+        "mlp-2": MLP2Experiment,
     }
 
-    experiment_cls = experiment_map[ram]
+    experiment_cls = experiment_map[model]
 
     # ------  Search space -------
     space = {
@@ -514,18 +432,6 @@ def main(
             [str(root_data_dir)]
         ),
         "dataset_name": optuna.distributions.CategoricalDistribution([dataset]),
-        "resolution": optuna.distributions.IntDistribution(
-            resolution_min, resolution_max, step=1
-        ),
-        "bleach": optuna.distributions.IntDistribution(
-            bleach_min, bleach_max, step=1, log=True
-        ),
-        "tuple_resolution_factor": optuna.distributions.CategoricalDistribution(
-            [1, 2]
-        ),
-        "encoder": optuna.distributions.CategoricalDistribution(
-            ["thermometer", "distributive-thermometer"]
-        ),
     }
 
     space.update(experiment_cls.get_search_space())
@@ -591,11 +497,11 @@ if __name__ == "__main__":
         help="Name of the dataset to use",
     )
     parser.add_argument(
-        "--ram",
-        choices=list(rams_cls.keys()),
+        "--model",
+        choices=list(classifiers.keys()),
         type=str,
         required=True,
-        help="RAM to use",
+        help="Classifier to use",
     )
     parser.add_argument(
         "--metric",
@@ -623,34 +529,6 @@ if __name__ == "__main__":
         required=False,
         default=None,
         help="Name of the experiment (output csv file). If None, time.time will be used",
-    )
-    parser.add_argument(
-        "--resolution-min",
-        type=int,
-        default=4,
-        required=False,
-        help="Minimum resolution of the encoder",
-    )
-    parser.add_argument(
-        "--resolution-max",
-        type=int,
-        default=64,
-        required=False,
-        help="Maximum resolution of the encoder",
-    )
-    parser.add_argument(
-        "--bleach-min",
-        type=int,
-        default=1,
-        required=False,
-        help="Minimum bleach value",
-    )
-    parser.add_argument(
-        "--bleach-max",
-        type=int,
-        default=1000,
-        required=False,
-        help="Maximum bleach value",
     )
     parser.add_argument(
         "--cpus",
@@ -687,37 +565,21 @@ if __name__ == "__main__":
 
     # Minimal preprocessing arguments
     root_data_dir = Path(args.root_data_dir).absolute()
-    output_dir = Path(args.output_dir) / args.dataset / args.ram
+    output_dir = Path(args.output_dir) / args.dataset / args.model
     output_dir.mkdir(parents=True, exist_ok=True)
     output_dir = output_dir.absolute()
     experiment_name = args.experiment_name or datetime.now().strftime(
         "%Y-%m-%d_%H-%M-%S"
     )
 
-    resolution_min = args.resolution_min
-    resolution_max = args.resolution_max
-    assert resolution_min >= 4, "resolution_min must be >= 4"
-    assert resolution_max <= 128, "resolution_max must be <= 128"
-    assert (
-        resolution_min <= resolution_max
-    ), "resolution_min must be <= resolution_max"
-
-    bleach_min = args.bleach_min
-    bleach_max = args.bleach_max
-    assert bleach_min >= 1, "bleach_min must be >= 1"
-    assert bleach_min <= bleach_max, "bleach_min must be <= bleach_max"
 
     main(
         dataset=args.dataset,
-        ram=args.ram,
-        metric=args.metric,
+        model=args.model,
         root_data_dir=root_data_dir,
+        metric=args.metric,
         output_dir=output_dir,
         experiment_name=experiment_name,
-        resolution_min=resolution_min,
-        resolution_max=resolution_max,
-        bleach_min=bleach_min,
-        bleach_max=bleach_max,
         cpus=args.cpus,
         budget=args.budget,
         num_samples=args.samples,
