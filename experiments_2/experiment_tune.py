@@ -58,25 +58,119 @@ rams_cls = {
 }
 
 datasets = {
-    "iris": {"path": Path("iris/data.pkl")},  # OK
-    "wine": {"path": Path("wine/data.pkl")},  # OK
-    "breast_cancer": {"path": Path("breast_cancer/data.pkl")},  # OK
-    "ecoli": {"path": Path("ecoli/data.pkl")},  #
-    "letter": {"path": Path("letter/data.pkl")},  # OK
-    "satimage": {"path": Path("satimage/data.pkl")},  # OK
-    "segment": {"path": Path("segment/data.pkl")},  # ~OK
-    "glass": {"path": Path("glass/data.pkl")},  # OK
-    "mnist": {"path": Path("mnist/data.pkl")},  # OK
-    "vehicle": {"path": Path("vehicle/data.pkl")},  # OK
-    "motion_sense": {"path": Path("motion_sense/data.pkl")},  # OK
-    "sensorless_drive": {"path": Path("sensorless_drive/data.pkl")},  # OK
-    "olivetti": {"path": Path("olivetti/data.pkl")},  # OK
-    "optical_handwritten": {"path": Path("optical_handwritten/data.pkl")},  # OK
-    "image_segmentation": {"path": Path("image_segmentation/data.pkl")},  # OK
-    "sepsis": {"path": Path("sepsis/data.pkl")},  # OK
-    "rice": {"path": Path("rice/data.pkl")},  # OK
-    "yeast": {"path": Path("yeast/data.pkl")},  # OK
-    "dry_bean": {"path": Path("dry_bean/data.pkl")},  # OK
+    "iris_fold_0": {"path": Path("iris_fold_0/data.pkl")},
+    "iris_fold_1": {"path": Path("iris_fold_1/data.pkl")},
+    "iris_fold_2": {"path": Path("iris_fold_2/data.pkl")},
+    "iris_fold_3": {"path": Path("iris_fold_3/data.pkl")},
+    "iris_fold_4": {"path": Path("iris_fold_4/data.pkl")},
+    
+    "wine_fold_0": {"path": Path("wine_fold_0/data.pkl")},
+    "wine_fold_1": {"path": Path("wine_fold_1/data.pkl")},
+    "wine_fold_2": {"path": Path("wine_fold_2/data.pkl")},
+    "wine_fold_3": {"path": Path("wine_fold_3/data.pkl")},
+    "wine_fold_4": {"path": Path("wine_fold_4/data.pkl")},
+    
+    "breast_cancer_fold_0": {"path": Path("breast_cancer_fold_0/data.pkl")},
+    "breast_cancer_fold_1": {"path": Path("breast_cancer_fold_1/data.pkl")},
+    "breast_cancer_fold_2": {"path": Path("breast_cancer_fold_2/data.pkl")},
+    "breast_cancer_fold_3": {"path": Path("breast_cancer_fold_3/data.pkl")},
+    "breast_cancer_fold_4": {"path": Path("breast_cancer_fold_4/data.pkl")},
+    
+    "ecoli_fold_0": {"path": Path("ecoli_fold_0/data.pkl")},
+    "ecoli_fold_1": {"path": Path("ecoli_fold_1/data.pkl")},
+    "ecoli_fold_2": {"path": Path("ecoli_fold_2/data.pkl")},
+    "ecoli_fold_3": {"path": Path("ecoli_fold_3/data.pkl")},
+    "ecoli_fold_4": {"path": Path("ecoli_fold_4/data.pkl")},
+    
+    "letter_fold_0": {"path": Path("letter_fold_0/data.pkl")},
+    "letter_fold_1": {"path": Path("letter_fold_1/data.pkl")},
+    "letter_fold_2": {"path": Path("letter_fold_2/data.pkl")},
+    "letter_fold_3": {"path": Path("letter_fold_3/data.pkl")},
+    "letter_fold_4": {"path": Path("letter_fold_4/data.pkl")},
+    
+    "satimage_fold_0": {"path": Path("satimage_fold_0/data.pkl")},
+    "satimage_fold_1": {"path": Path("satimage_fold_1/data.pkl")},
+    "satimage_fold_2": {"path": Path("satimage_fold_2/data.pkl")},
+    "satimage_fold_3": {"path": Path("satimage_fold_3/data.pkl")},
+    "satimage_fold_4": {"path": Path("satimage_fold_4/data.pkl")},
+    
+    "segment_fold_0": {"path": Path("segment_fold_0/data.pkl")},
+    "segment_fold_1": {"path": Path("segment_fold_1/data.pkl")},
+    "segment_fold_2": {"path": Path("segment_fold_2/data.pkl")},
+    "segment_fold_3": {"path": Path("segment_fold_3/data.pkl")},
+    "segment_fold_4": {"path": Path("segment_fold_4/data.pkl")},
+    
+    "glass_fold_0": {"path": Path("glass_fold_0/data.pkl")},
+    "glass_fold_1": {"path": Path("glass_fold_1/data.pkl")},
+    "glass_fold_2": {"path": Path("glass_fold_2/data.pkl")},
+    "glass_fold_3": {"path": Path("glass_fold_3/data.pkl")},
+    "glass_fold_4": {"path": Path("glass_fold_4/data.pkl")},
+    
+    # "mnist_fold_0": {"path": Path("mnist_fold_0/data.pkl")},
+    # "mnist_fold_1": {"path": Path("mnist_fold_1/data.pkl")},
+    # "mnist_fold_2": {"path": Path("mnist_fold_2/data.pkl")},
+    # "mnist_fold_3": {"path": Path("mnist_fold_3/data.pkl")},
+    # "mnist_fold_4": {"path": Path("mnist_fold_4/data.pkl")},
+    
+    "vehicle_fold_0": {"path": Path("vehicle_fold_0/data.pkl")},
+    "vehicle_fold_1": {"path": Path("vehicle_fold_1/data.pkl")},
+    "vehicle_fold_2": {"path": Path("vehicle_fold_2/data.pkl")},
+    "vehicle_fold_3": {"path": Path("vehicle_fold_3/data.pkl")},
+    "vehicle_fold_4": {"path": Path("vehicle_fold_4/data.pkl")},
+    
+    "motion_sense_fold_0": {"path": Path("motion_sense_fold_0/data.pkl")},
+    "motion_sense_fold_1": {"path": Path("motion_sense_fold_1/data.pkl")},
+    "motion_sense_fold_2": {"path": Path("motion_sense_fold_2/data.pkl")},
+    "motion_sense_fold_3": {"path": Path("motion_sense_fold_3/data.pkl")},
+    "motion_sense_fold_4": {"path": Path("motion_sense_fold_4/data.pkl")},
+    
+    # "sensorless_drive_fold_0": {"path": Path("sensorless_drive_fold_0/data.pkl")},
+    # "sensorless_drive_fold_1": {"path": Path("sensorless_drive_fold_1/data.pkl")},
+    # "sensorless_drive_fold_2": {"path": Path("sensorless_drive_fold_2/data.pkl")},
+    # "sensorless_drive_fold_3": {"path": Path("sensorless_drive_fold_3/data.pkl")},
+    # "sensorless_drive_fold_4": {"path": Path("sensorless_drive_fold_4/data.pkl")},
+    
+    "optical_handwritten_fold_0": {"path": Path("optical_handwritten_fold_0/data.pkl")},
+    "optical_handwritten_fold_1": {"path": Path("optical_handwritten_fold_1/data.pkl")},
+    "optical_handwritten_fold_2": {"path": Path("optical_handwritten_fold_2/data.pkl")},
+    "optical_handwritten_fold_3": {"path": Path("optical_handwritten_fold_3/data.pkl")},
+    "optical_handwritten_fold_4": {"path": Path("optical_handwritten_fold_4/data.pkl")},
+    
+    "image_segmentation_fold_0": {"path": Path("image_segmentation_fold_0/data.pkl")},
+    "image_segmentation_fold_1": {"path": Path("image_segmentation_fold_1/data.pkl")},
+    "image_segmentation_fold_2": {"path": Path("image_segmentation_fold_2/data.pkl")},
+    "image_segmentation_fold_3": {"path": Path("image_segmentation_fold_3/data.pkl")},
+    "image_segmentation_fold_4": {"path": Path("image_segmentation_fold_4/data.pkl")},
+    
+    "sepsis_fold_0": {"path": Path("sepsis_fold_0/data.pkl")},
+    "sepsis_fold_1": {"path": Path("sepsis_fold_1/data.pkl")},
+    "sepsis_fold_2": {"path": Path("sepsis_fold_2/data.pkl")},
+    "sepsis_fold_3": {"path": Path("sepsis_fold_3/data.pkl")},
+    "sepsis_fold_4": {"path": Path("sepsis_fold_4/data.pkl")},
+    
+    "rice_fold_0": {"path": Path("rice_fold_0/data.pkl")},
+    "rice_fold_1": {"path": Path("rice_fold_1/data.pkl")},
+    "rice_fold_2": {"path": Path("rice_fold_2/data.pkl")},
+    "rice_fold_3": {"path": Path("rice_fold_3/data.pkl")},
+    "rice_fold_4": {"path": Path("rice_fold_4/data.pkl")},
+    
+    "yeast_fold_0": {"path": Path("yeast_fold_0/data.pkl")},
+    "yeast_fold_1": {"path": Path("yeast_fold_1/data.pkl")},
+    "yeast_fold_2": {"path": Path("yeast_fold_2/data.pkl")},
+    "yeast_fold_3": {"path": Path("yeast_fold_3/data.pkl")},
+    "yeast_fold_4": {"path": Path("yeast_fold_4/data.pkl")},
+    
+    "dry_bean_fold_0": {"path": Path("dry_bean_fold_0/data.pkl")},
+    "dry_bean_fold_1": {"path": Path("dry_bean_fold_1/data.pkl")},
+    "dry_bean_fold_2": {"path": Path("dry_bean_fold_2/data.pkl")},
+    "dry_bean_fold_3": {"path": Path("dry_bean_fold_3/data.pkl")},
+    "dry_bean_fold_4": {"path": Path("dry_bean_fold_4/data.pkl")},
+    
+    # "olivetti_fold_0": {"path": Path("olivetti_fold_0/data.pkl")},
+    # "olivetti_fold_1": {"path": Path("olivetti_fold_1/data.pkl")},
+    # "olivetti_fold_2": {"path": Path("olivetti_fold_2/data.pkl")},
+    # "olivetti_fold_3": {"path": Path("olivetti_fold_3/data.pkl")},
+    # "olivetti_fold_4": {"path": Path("olivetti_fold_4/data.pkl")},
 }
 
 
