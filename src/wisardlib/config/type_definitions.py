@@ -1,7 +1,8 @@
-import os
 import numpy
-from typing import Union, Hashable
+from typing import Union
 import numpy.typing as npt
 
 # The input for WiSARDs is an array of booleans
-BooleanArray = npt.NDArray[bool]
+ByteArray = Union[npt.NDArray[numpy.ubyte], npt.NDArray[numpy.bool]]
+Address = ByteArray
+Sample = ByteArray

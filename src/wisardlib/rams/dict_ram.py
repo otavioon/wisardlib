@@ -9,7 +9,7 @@ from .base import JoinableRAM
 from typing import Hashable
 
 
-from wisardlib.config.type_definitions import BooleanArray
+from wisardlib.config.type_definitions import ByteArray
 
 
 def size_of_dict(numba_dict) -> int:
@@ -28,33 +28,22 @@ class DictRAM(JoinableRAM):
         )
         self._key_len = 1
 
-    # def encode_key(self, key: BooleanArray):
-    #     k = str().join(str(k * 1) for k in key)
-    #     self._key_len = len(k)
-    #     return k
-
-    def add_member(self, key: BooleanArray, inc_val: int = 1):
-        global x, f
+    def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         if key not in self._addresses:
             self._addresses[key] = inc_val
         else:
             self._addresses[key] += inc_val
 
-        # f.write(f"{x}: {len(self._addresses) / 2**len(key)} \n")
-        # f.write(str(len(self._addresses) / 2**len(key)) + "\n")
-        # print(x, len(self._addresses) / 2**len(key))
-        # x += 1
-
     def join(self, other: "DictRAM"):
         for key, value in other._addresses.items():
             self._addresses[key] = self._addresses.get(key, 0) + value
 
-    def __contains__(self, key: BooleanArray):
+    def __contains__(self, key: ByteArray):
         key = self.encode_key(key)
         return key in self._addresses
 
-    def __getitem__(self, key: BooleanArray):
+    def __getitem__(self, key: ByteArray):
         key = self.encode_key(key)
         return self._addresses.get(key, 0)
 

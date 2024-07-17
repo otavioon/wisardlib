@@ -3,7 +3,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from wisardlib.config.type_definitions import BooleanArray
+from wisardlib.config.type_definitions import ByteArray
 from wisardlib.encoders.base import Encoder
 
 # @jit(nopython=True, inline='always')
@@ -29,38 +29,13 @@ class ThermometerEncoder(Encoder):
         )
         return self
 
-    def transform(self, X: np.ndarray) -> BooleanArray:
+    def transform(self, X: np.ndarray) -> ByteArray:
         new_shape = X.shape + (self.resolution,)
         new_X = [
             int_to_binary_list((1 << x + 1) - 1, self.resolution, reverse=True)
             for x in np.digitize(X - self.min_val, self.buckets).ravel()
         ]
         return np.array(new_X, dtype=bool).reshape(new_shape)
-
-
-class NestedThermometerEncoder(Encoder):
-    def __init__(self, resolution: int, resolution_2: int, shuffle: bool = True):
-        self.resolution = resolution
-        self.resolution_2 = resolution_2
-        self.thermometer = ThermometerEncoder(resolution_2)
-        self.min_val = None
-        self.buckets = []
-        self.shuffle = shuffle
-
-    def fit(self, X, y=None, **fit_args):
-        self.min_val = np.min(X)
-        self.buckets = (
-            (np.arange(self.resolution) + 1)
-            * (np.max(X) - np.min(X))
-            / (self.resolution + 1)
-        )
-        return self
-
-    def transform(self, X: np.ndarray):
-        dig_X = np.digitize(X - self.min_val, self.buckets)
-        if self.shuffle:
-            np.random.shuffle(dig_X)
-        return self.thermometer.fit(dig_X).transform(dig_X)
 
 
 class DistributiveThermometerEncoder(ThermometerEncoder):
@@ -74,7 +49,7 @@ class DistributiveThermometerEncoder(ThermometerEncoder):
             q = (res_max + res_min) // 2
             result = pd.qcut(X.ravel(), q=q, duplicates="drop")
             size = len(result.categories)
-            print(f"q: {q}, size: {size}, min: {res_min}, max: {res_max}")
+            # print(f"q: {q}, size: {size}, min: {res_min}, max: {res_max}")
 
             if size == self.resolution:
                 self.buckets = [x.right for x in result.categories]

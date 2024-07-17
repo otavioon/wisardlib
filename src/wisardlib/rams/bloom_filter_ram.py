@@ -14,7 +14,7 @@ from probables import (
 )
 
 from .base import RAM, JoinableRAM
-from wisardlib.config.type_definitions import BooleanArray
+from wisardlib.config.type_definitions import ByteArray
 
 
 def size_of_bloom(filter) -> int:
@@ -33,18 +33,18 @@ class CountingBloomFilterRAM(JoinableRAM):
     # def encode_key(self, key: BooleanArray):
     #     return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key: BooleanArray, inc_val: int = 1):
+    def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
     def join(self, other: "CountingBloomFilterRAM"):
         self.bloom_filter = self.bloom_filter.union(other.bloom_filter)
 
-    def __contains__(self, key: BooleanArray):
+    def __contains__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key: BooleanArray):
+    def __getitem__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -73,18 +73,18 @@ class CountMinSketchRAM(JoinableRAM):
     # def encode_key(self, key: BooleanArray):
     #     return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key: BooleanArray, inc_val: int = 1):
+    def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
     def join(self, other: "CountMinSketchRAM"):
         self.bloom_filter.join(other.bloom_filter)
 
-    def __contains__(self, key: BooleanArray):
+    def __contains__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key: BooleanArray):
+    def __getitem__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -119,15 +119,15 @@ class CountingCuckooRAM(RAM):
     # def encode_key(self, key: BooleanArray):
     #     return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key: BooleanArray, inc_val: int = 1):
+    def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
-    def __contains__(self, key: BooleanArray):
+    def __contains__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key: BooleanArray):
+    def __getitem__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -157,18 +157,18 @@ class HeavyHittersRAM(JoinableRAM):
     # def encode_key(self, key: BooleanArray):
     #     return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key: BooleanArray, inc_val: int = 1):
+    def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
     def join(self, other: "HeavyHittersRAM"):
         self.bloom_filter.join(other.bloom_filter)
 
-    def __contains__(self, key: BooleanArray):
+    def __contains__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key: BooleanArray):
+    def __getitem__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
@@ -198,18 +198,18 @@ class StreamThresholdRAM(JoinableRAM):
     # def encode_key(self, key: BooleanArray):
     #     return str().join(str(k * 1) for k in key)
 
-    def add_member(self, key: BooleanArray, inc_val: int = 1):
+    def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
     def join(self, other: "StreamThresholdRAM"):
         self.bloom_filter.join(other.bloom_filter)
 
-    def __contains__(self, key: BooleanArray):
+    def __contains__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key) > 0
 
-    def __getitem__(self, key: BooleanArray):
+    def __getitem__(self, key: ByteArray):
         key = self.encode_key(key)
         return self.bloom_filter.check(key)
 
