@@ -18,7 +18,10 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         libssl-dev \
         nvtop \
         net-tools \
-        software-properties-common \
+        python3-all  \
+        python-is-python3 \
+        python3-pip \
+        python3-venv \
         tmux \
         tree \
         unrar \
@@ -26,13 +29,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         vim \
         wget \
         xdot
-
-# Install python 3 and set it 10 as default
-RUN add-apt-repository ppa:deadsnakes/ppa -y && \
-    apt update && \
-    apt install -y python3.10 python3.10-venv python3-pip && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 && \
-    update-alternatives --set python /usr/bin/python3.10
 
 # Create the vscode user (non-root user) and add sudo support
 RUN groupadd --gid $USER_GID $USERNAME && \
@@ -58,8 +54,8 @@ RUN     rm -rf /var/lib/apt/lists/* && \
 # ***************** Specific packages ********************
 
 # System-wide python packages
-RUN python -m pip install --upgrade pip setuptools pytest
-RUN python -m pip install black \
+RUN python -m pip install --upgrade pip setuptools pytest && \
+    python -m pip install black \
         ipykernel \
         kaleido \
         matplotlib \
@@ -70,7 +66,7 @@ RUN python -m pip install black \
         seaborn \
         scipy 
 
-# Change shell for user
+# Change shell for user b
 RUN chsh --shell /bin/bash $USERNAME
 #  Set the default user
 USER $USERNAME

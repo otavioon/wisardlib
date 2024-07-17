@@ -28,8 +28,6 @@ do
             --output-dir "${OUTPUTDIR}" \
             --resolution-min "${RESOLUTIONMIN}" \
             --resolution-max "${RESOLUTIONMAX}" \
-            --bleach-min "${BLEACHMIN}" \
-            --bleach-max "${BLEACHMAX}" \
             --cpus ${CPUS} \
             --budget ${BUDGET} &
     done

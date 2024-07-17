@@ -2,8 +2,6 @@ import argparse
 from ast import Dict
 from collections import defaultdict
 from pathlib import Path
-import random
-import time
 from typing import Optional
 
 import numpy as np
@@ -24,13 +22,10 @@ from wisardlib.rams.dict_ram import DictRAM
 from wisardlib.rams.bloom_filter_ram import (
     CountingBloomFilterRAM,
     CountMinSketchRAM,
-    CountMeanSketchRAM,
-    CountMeanMinSketchRAM,
     CountingCuckooRAM,
     HeavyHittersRAM,
     StreamThresholdRAM,
 )
-from ray.tune.search import ConcurrencyLimiter
 
 from wisardlib.builder import build_symmetric_wisard
 from wisardlib.utils import untie_by_first_class
@@ -50,8 +45,6 @@ rams_cls = {
     "dict": DictRAM,
     "count-bloom": CountingBloomFilterRAM,
     "count-min-sketch": CountMinSketchRAM,
-    "count-mean-sketch": CountMeanSketchRAM,
-    "count-mean-min-sketch": CountMeanMinSketchRAM,
     "heavy-hitters": HeavyHittersRAM,
     "stream-threshold": StreamThresholdRAM,
     "count-cuckoo": CountingCuckooRAM,
@@ -63,109 +56,121 @@ datasets = {
     "iris_fold_2": {"path": Path("iris_fold_2/data.pkl")},
     "iris_fold_3": {"path": Path("iris_fold_3/data.pkl")},
     "iris_fold_4": {"path": Path("iris_fold_4/data.pkl")},
-    
     "wine_fold_0": {"path": Path("wine_fold_0/data.pkl")},
     "wine_fold_1": {"path": Path("wine_fold_1/data.pkl")},
     "wine_fold_2": {"path": Path("wine_fold_2/data.pkl")},
     "wine_fold_3": {"path": Path("wine_fold_3/data.pkl")},
     "wine_fold_4": {"path": Path("wine_fold_4/data.pkl")},
-    
     "breast_cancer_fold_0": {"path": Path("breast_cancer_fold_0/data.pkl")},
     "breast_cancer_fold_1": {"path": Path("breast_cancer_fold_1/data.pkl")},
     "breast_cancer_fold_2": {"path": Path("breast_cancer_fold_2/data.pkl")},
     "breast_cancer_fold_3": {"path": Path("breast_cancer_fold_3/data.pkl")},
     "breast_cancer_fold_4": {"path": Path("breast_cancer_fold_4/data.pkl")},
-    
     "ecoli_fold_0": {"path": Path("ecoli_fold_0/data.pkl")},
     "ecoli_fold_1": {"path": Path("ecoli_fold_1/data.pkl")},
     "ecoli_fold_2": {"path": Path("ecoli_fold_2/data.pkl")},
     "ecoli_fold_3": {"path": Path("ecoli_fold_3/data.pkl")},
     "ecoli_fold_4": {"path": Path("ecoli_fold_4/data.pkl")},
-    
     "letter_fold_0": {"path": Path("letter_fold_0/data.pkl")},
     "letter_fold_1": {"path": Path("letter_fold_1/data.pkl")},
     "letter_fold_2": {"path": Path("letter_fold_2/data.pkl")},
     "letter_fold_3": {"path": Path("letter_fold_3/data.pkl")},
     "letter_fold_4": {"path": Path("letter_fold_4/data.pkl")},
-    
     "satimage_fold_0": {"path": Path("satimage_fold_0/data.pkl")},
     "satimage_fold_1": {"path": Path("satimage_fold_1/data.pkl")},
     "satimage_fold_2": {"path": Path("satimage_fold_2/data.pkl")},
     "satimage_fold_3": {"path": Path("satimage_fold_3/data.pkl")},
     "satimage_fold_4": {"path": Path("satimage_fold_4/data.pkl")},
-    
     "segment_fold_0": {"path": Path("segment_fold_0/data.pkl")},
     "segment_fold_1": {"path": Path("segment_fold_1/data.pkl")},
     "segment_fold_2": {"path": Path("segment_fold_2/data.pkl")},
     "segment_fold_3": {"path": Path("segment_fold_3/data.pkl")},
     "segment_fold_4": {"path": Path("segment_fold_4/data.pkl")},
-    
     "glass_fold_0": {"path": Path("glass_fold_0/data.pkl")},
     "glass_fold_1": {"path": Path("glass_fold_1/data.pkl")},
     "glass_fold_2": {"path": Path("glass_fold_2/data.pkl")},
     "glass_fold_3": {"path": Path("glass_fold_3/data.pkl")},
     "glass_fold_4": {"path": Path("glass_fold_4/data.pkl")},
-    
     # "mnist_fold_0": {"path": Path("mnist_fold_0/data.pkl")},
     # "mnist_fold_1": {"path": Path("mnist_fold_1/data.pkl")},
     # "mnist_fold_2": {"path": Path("mnist_fold_2/data.pkl")},
     # "mnist_fold_3": {"path": Path("mnist_fold_3/data.pkl")},
     # "mnist_fold_4": {"path": Path("mnist_fold_4/data.pkl")},
-    
     "vehicle_fold_0": {"path": Path("vehicle_fold_0/data.pkl")},
     "vehicle_fold_1": {"path": Path("vehicle_fold_1/data.pkl")},
     "vehicle_fold_2": {"path": Path("vehicle_fold_2/data.pkl")},
     "vehicle_fold_3": {"path": Path("vehicle_fold_3/data.pkl")},
     "vehicle_fold_4": {"path": Path("vehicle_fold_4/data.pkl")},
-    
     "motion_sense_fold_0": {"path": Path("motion_sense_fold_0/data.pkl")},
     "motion_sense_fold_1": {"path": Path("motion_sense_fold_1/data.pkl")},
     "motion_sense_fold_2": {"path": Path("motion_sense_fold_2/data.pkl")},
     "motion_sense_fold_3": {"path": Path("motion_sense_fold_3/data.pkl")},
     "motion_sense_fold_4": {"path": Path("motion_sense_fold_4/data.pkl")},
-    
-    # "sensorless_drive_fold_0": {"path": Path("sensorless_drive_fold_0/data.pkl")},
-    # "sensorless_drive_fold_1": {"path": Path("sensorless_drive_fold_1/data.pkl")},
-    # "sensorless_drive_fold_2": {"path": Path("sensorless_drive_fold_2/data.pkl")},
-    # "sensorless_drive_fold_3": {"path": Path("sensorless_drive_fold_3/data.pkl")},
-    # "sensorless_drive_fold_4": {"path": Path("sensorless_drive_fold_4/data.pkl")},
-    
-    "optical_handwritten_fold_0": {"path": Path("optical_handwritten_fold_0/data.pkl")},
-    "optical_handwritten_fold_1": {"path": Path("optical_handwritten_fold_1/data.pkl")},
-    "optical_handwritten_fold_2": {"path": Path("optical_handwritten_fold_2/data.pkl")},
-    "optical_handwritten_fold_3": {"path": Path("optical_handwritten_fold_3/data.pkl")},
-    "optical_handwritten_fold_4": {"path": Path("optical_handwritten_fold_4/data.pkl")},
-    
-    "image_segmentation_fold_0": {"path": Path("image_segmentation_fold_0/data.pkl")},
-    "image_segmentation_fold_1": {"path": Path("image_segmentation_fold_1/data.pkl")},
-    "image_segmentation_fold_2": {"path": Path("image_segmentation_fold_2/data.pkl")},
-    "image_segmentation_fold_3": {"path": Path("image_segmentation_fold_3/data.pkl")},
-    "image_segmentation_fold_4": {"path": Path("image_segmentation_fold_4/data.pkl")},
-    
+    # "sensorless_drive_fold_0": {
+    #     "path": Path("sensorless_drive_fold_0/data.pkl")
+    # },
+    # "sensorless_drive_fold_1": {
+    #     "path": Path("sensorless_drive_fold_1/data.pkl")
+    # },
+    # "sensorless_drive_fold_2": {
+    #     "path": Path("sensorless_drive_fold_2/data.pkl")
+    # },
+    # "sensorless_drive_fold_3": {
+    #     "path": Path("sensorless_drive_fold_3/data.pkl")
+    # },
+    # "sensorless_drive_fold_4": {
+    #     "path": Path("sensorless_drive_fold_4/data.pkl")
+    # },
+    "optical_handwritten_fold_0": {
+        "path": Path("optical_handwritten_fold_0/data.pkl")
+    },
+    "optical_handwritten_fold_1": {
+        "path": Path("optical_handwritten_fold_1/data.pkl")
+    },
+    "optical_handwritten_fold_2": {
+        "path": Path("optical_handwritten_fold_2/data.pkl")
+    },
+    "optical_handwritten_fold_3": {
+        "path": Path("optical_handwritten_fold_3/data.pkl")
+    },
+    "optical_handwritten_fold_4": {
+        "path": Path("optical_handwritten_fold_4/data.pkl")
+    },
+    "image_segmentation_fold_0": {
+        "path": Path("image_segmentation_fold_0/data.pkl")
+    },
+    "image_segmentation_fold_1": {
+        "path": Path("image_segmentation_fold_1/data.pkl")
+    },
+    "image_segmentation_fold_2": {
+        "path": Path("image_segmentation_fold_2/data.pkl")
+    },
+    "image_segmentation_fold_3": {
+        "path": Path("image_segmentation_fold_3/data.pkl")
+    },
+    "image_segmentation_fold_4": {
+        "path": Path("image_segmentation_fold_4/data.pkl")
+    },
     "sepsis_fold_0": {"path": Path("sepsis_fold_0/data.pkl")},
     "sepsis_fold_1": {"path": Path("sepsis_fold_1/data.pkl")},
     "sepsis_fold_2": {"path": Path("sepsis_fold_2/data.pkl")},
     "sepsis_fold_3": {"path": Path("sepsis_fold_3/data.pkl")},
     "sepsis_fold_4": {"path": Path("sepsis_fold_4/data.pkl")},
-    
     "rice_fold_0": {"path": Path("rice_fold_0/data.pkl")},
     "rice_fold_1": {"path": Path("rice_fold_1/data.pkl")},
     "rice_fold_2": {"path": Path("rice_fold_2/data.pkl")},
     "rice_fold_3": {"path": Path("rice_fold_3/data.pkl")},
     "rice_fold_4": {"path": Path("rice_fold_4/data.pkl")},
-    
     "yeast_fold_0": {"path": Path("yeast_fold_0/data.pkl")},
     "yeast_fold_1": {"path": Path("yeast_fold_1/data.pkl")},
     "yeast_fold_2": {"path": Path("yeast_fold_2/data.pkl")},
     "yeast_fold_3": {"path": Path("yeast_fold_3/data.pkl")},
     "yeast_fold_4": {"path": Path("yeast_fold_4/data.pkl")},
-    
     "dry_bean_fold_0": {"path": Path("dry_bean_fold_0/data.pkl")},
     "dry_bean_fold_1": {"path": Path("dry_bean_fold_1/data.pkl")},
     "dry_bean_fold_2": {"path": Path("dry_bean_fold_2/data.pkl")},
     "dry_bean_fold_3": {"path": Path("dry_bean_fold_3/data.pkl")},
     "dry_bean_fold_4": {"path": Path("dry_bean_fold_4/data.pkl")},
-    
     # "olivetti_fold_0": {"path": Path("olivetti_fold_0/data.pkl")},
     # "olivetti_fold_1": {"path": Path("olivetti_fold_1/data.pkl")},
     # "olivetti_fold_2": {"path": Path("olivetti_fold_2/data.pkl")},
@@ -195,7 +200,6 @@ class Timer:
         self.time = perf_counter() - self.start
 
 
-
 class BaseEperiment(tune.Trainable):
     RAM_name = ""
 
@@ -213,7 +217,7 @@ class BaseEperiment(tune.Trainable):
         )
         metrics["f1 weighted"].append(
             f1_score(y_true, y_pred, average="weighted")
-        )     
+        )
         metrics["size"].append(self.model.size())
 
         result = {
@@ -221,25 +225,24 @@ class BaseEperiment(tune.Trainable):
             f"{stage}_ties": ties,
             f"{stage}_ties_mean": np.mean(metrics["ties"]),
             f"{stage}_ties_std": np.std(metrics["ties"]),
-            
             # Accuracy
             f"{stage}_accuracy": metrics["accuracy"][-1],
             f"{stage}_accuracy_mean": np.mean(np.array(metrics["accuracy"])),
             f"{stage}_accuracy_std": np.std(np.array(metrics["accuracy"])),
-            
             # f1 weighted
             f"{stage}_f1 weighted": metrics["f1 weighted"][-1],
-            f"{stage}_f1 weighted_mean": np.mean(np.array(metrics["f1 weighted"])),
+            f"{stage}_f1 weighted_mean": np.mean(
+                np.array(metrics["f1 weighted"])
+            ),
             f"{stage}_f1 weighted_std": np.std(
                 np.array(metrics["f1 weighted"])
             ),
-            
             # Size
             f"{stage}_model size": metrics["size"][-1],
             f"{stage}_model size_mean": np.mean(np.array(metrics["size"])),
             f"{stage}_model size_std": np.std(np.array(metrics["size"])),
         }
-        
+
         return result
 
     def setup(self, config):
@@ -283,7 +286,7 @@ class BaseEperiment(tune.Trainable):
         self.ram_cls = rams_cls[self.RAM_name]
         self.ram_kwargs = self._get_ram_config(config)
         # Other parameters
-        self.bleach = config["bleach"]
+        # self.bleach = config["bleach"]
         self.number_of_rams_per_discriminator = self.indices // self.tuple_size
 
     def step(self):
@@ -292,10 +295,10 @@ class BaseEperiment(tune.Trainable):
             RAM_creation_kwargs=self.ram_kwargs,
             number_of_rams_per_discriminator=self.number_of_rams_per_discriminator,
             number_of_discriminators=self.n_classes,
-            indices=self.indices,
             tuple_size=self.tuple_size,
-            shuffle_indices=True,
             use_tqdm=False,
+            # indices=self.indices,
+            # shuffle_indices=True,
         )
 
         # Fit model on train data
@@ -303,17 +306,17 @@ class BaseEperiment(tune.Trainable):
             self.model.fit(self.x_train, self.y_train)
 
         # Predict with validation data
-        self.model.bleach = self.bleach
-        
+        # self.model.bleach = self.bleach
+
         with Timer() as t_val_predict_time:
             y_pred = self.model.predict(self.x_val)
-            y_pred, ties = untie_by_first_class(y_pred, use_tqdm=False)
-            
+            # y_pred, ties = untie_by_first_class(y_pred, use_tqdm=False)
+
         metrics = self._get_metrics(
             metrics=self.val_metrics,
             y_pred=y_pred,
             y_true=self.y_val,
-            ties=ties,
+            ties=self.model.bleaching_method.ties,
             stage="val",
         )
         metrics["ram"] = self.RAM_name
@@ -323,27 +326,29 @@ class BaseEperiment(tune.Trainable):
         metrics["val_samples"] = len(self.x_val)
         metrics["test_samples"] = len(self.x_test)
         metrics["classes"] = self.n_classes
-        metrics["rams per discriminator"] = self.number_of_rams_per_discriminator
+        metrics["rams per discriminator"] = (
+            self.number_of_rams_per_discriminator
+        )
         metrics["discriminators"] = self.n_classes
-        metrics["indices"] = self.indices
-        
+        # metrics["indices"] = self.indices
+
         # Add validation samples
         self.model.fit(self.x_val, self.y_val)
-        
+
         # Predict with test data
-        self.model.bleach = self.bleach
+        # self.model.bleach = self.bleach
         with Timer() as t_test_predict_time:
             y_pred = self.model.predict(self.x_test)
             y_pred, ties = untie_by_first_class(y_pred, use_tqdm=False)
-            
+
         test_metrics = self._get_metrics(
             metrics=self.test_metrics,
             y_pred=y_pred,
             y_true=self.y_test,
-            ties=ties,
+            ties=self.model.bleaching_method.ties,
             stage="test",
         )
-        
+
         metrics.update(test_metrics)
         metrics["test_predict time"] = t_test_predict_time.time
         return metrics
@@ -488,8 +493,8 @@ def main(
     experiment_name: str,
     resolution_min: int,
     resolution_max: int,
-    bleach_min: int,
-    bleach_max: int,
+    # bleach_min: int,
+    # bleach_max: int,
     cpus: int,
     budget: int,
     num_samples: int = 10000,
@@ -517,9 +522,9 @@ def main(
         "resolution": optuna.distributions.IntDistribution(
             resolution_min, resolution_max, step=1
         ),
-        "bleach": optuna.distributions.IntDistribution(
-            bleach_min, bleach_max, step=1, log=True
-        ),
+        # "bleach": optuna.distributions.IntDistribution(
+        #     bleach_min, bleach_max, step=1, log=True
+        # ),
         "tuple_resolution_factor": optuna.distributions.CategoricalDistribution(
             [1, 2]
         ),
@@ -638,20 +643,20 @@ if __name__ == "__main__":
         required=False,
         help="Maximum resolution of the encoder",
     )
-    parser.add_argument(
-        "--bleach-min",
-        type=int,
-        default=1,
-        required=False,
-        help="Minimum bleach value",
-    )
-    parser.add_argument(
-        "--bleach-max",
-        type=int,
-        default=1000,
-        required=False,
-        help="Maximum bleach value",
-    )
+    # parser.add_argument(
+    #     "--bleach-min",
+    #     type=int,
+    #     default=1,
+    #     required=False,
+    #     help="Minimum bleach value",
+    # )
+    # parser.add_argument(
+    #     "--bleach-max",
+    #     type=int,
+    #     default=1000,
+    #     required=False,
+    #     help="Maximum bleach value",
+    # )
     parser.add_argument(
         "--cpus",
         type=int,
@@ -702,10 +707,10 @@ if __name__ == "__main__":
         resolution_min <= resolution_max
     ), "resolution_min must be <= resolution_max"
 
-    bleach_min = args.bleach_min
-    bleach_max = args.bleach_max
-    assert bleach_min >= 1, "bleach_min must be >= 1"
-    assert bleach_min <= bleach_max, "bleach_min must be <= bleach_max"
+    # bleach_min = args.bleach_min
+    # bleach_max = args.bleach_max
+    # assert bleach_min >= 1, "bleach_min must be >= 1"
+    # assert bleach_min <= bleach_max, "bleach_min must be <= bleach_max"
 
     main(
         dataset=args.dataset,
@@ -716,8 +721,8 @@ if __name__ == "__main__":
         experiment_name=experiment_name,
         resolution_min=resolution_min,
         resolution_max=resolution_max,
-        bleach_min=bleach_min,
-        bleach_max=bleach_max,
+        # bleach_min=bleach_min,
+        # bleach_max=bleach_max,
         cpus=args.cpus,
         budget=args.budget,
         num_samples=args.samples,

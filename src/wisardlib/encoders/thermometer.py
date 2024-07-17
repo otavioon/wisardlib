@@ -4,7 +4,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from wisardlib.config.type_definitions import BooleanArray
+from wisardlib.config.type_definitions import ByteArray
 from wisardlib.encoders.base import Encoder
 
 class ThermometerEncoder(Encoder):
@@ -19,8 +19,7 @@ class ThermometerEncoder(Encoder):
         self.buckets = ((np.arange(self.resolution) + 1) * (max_val - self.min_val) / (self.resolution + 1))
         return self
 
-    def transform(self, X: np.ndarray) -> BooleanArray:
-        start = time.time()
+    def transform(self, X: np.ndarray) -> ByteArray:
         new_shape = X.shape + (self.resolution,)
         digitized = np.digitize(X - self.min_val, self.buckets).ravel()
         
@@ -33,31 +32,6 @@ class ThermometerEncoder(Encoder):
         print(f"Time: {time.time() - start}")
 
         return new_X.reshape(new_shape)
-
-
-class NestedThermometerEncoder(Encoder):
-    def __init__(self, resolution: int, resolution_2: int, shuffle: bool = True):
-        self.resolution = resolution
-        self.resolution_2 = resolution_2
-        self.thermometer = ThermometerEncoder(resolution_2)
-        self.min_val = None
-        self.buckets = []
-        self.shuffle = shuffle
-
-    def fit(self, X, y=None, **fit_args):
-        self.min_val = np.min(X)
-        self.buckets = (
-            (np.arange(self.resolution) + 1)
-            * (np.max(X) - np.min(X))
-            / (self.resolution + 1)
-        )
-        return self
-
-    def transform(self, X: np.ndarray):
-        dig_X = np.digitize(X - self.min_val, self.buckets)
-        if self.shuffle:
-            np.random.shuffle(dig_X)
-        return self.thermometer.fit(dig_X).transform(dig_X)
 
 
 class DistributiveThermometerEncoder(ThermometerEncoder):
