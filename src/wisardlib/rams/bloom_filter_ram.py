@@ -8,9 +8,11 @@ from typing import Hashable
 from probables import (
     CountingBloomFilter,
     CountMinSketch,
-    CountingCuckooFilter,
+    CountMeanSketch,
+    CountMeanMinSketch,
     HeavyHitters,
     StreamThreshold,
+    CountingCuckooFilter,
 )
 
 from .base import RAM, JoinableRAM
@@ -25,7 +27,9 @@ def size_of_bloom(filter) -> int:
 
 
 class CountingBloomFilterRAM(JoinableRAM):
-    def __init__(self, est_elements: int = 1000, false_positive_rate: float = 0.05):
+    def __init__(
+        self, est_elements: int = 1000, false_positive_rate: float = 0.05
+    ):
         self.bloom_filter = CountingBloomFilter(
             est_elements=est_elements, false_positive_rate=false_positive_rate
         )
@@ -56,18 +60,27 @@ class CountingBloomFilterRAM(JoinableRAM):
 
     def size(self) -> int:
         return size_of_bloom(self.bloom_filter)
+    
+    def false_positive_rate(self) -> float:
+        return self.bloom_filter.false_positive_rate
 
 
-class CountMinSketchRAM(JoinableRAM):
+class _CMSRam(JoinableRAM):
+    RAM_cls = None
+    RAM_name = ""
+
     def __init__(
         self,
-        width: int = 1000,
-        depth: int = 5,
+        width: int = None,
+        depth: int = None,
         confidence: float = None,
         soft_error_rate: float = None,
     ):
-        self.bloom_filter = CountMinSketch(
-            width=width, depth=depth, confidence=confidence, error_rate=soft_error_rate
+        self.bloom_filter = self.RAM_cls(
+            width=width,
+            depth=depth,
+            confidence=confidence,
+            error_rate=soft_error_rate,
         )
 
     # def encode_key(self, key: BooleanArray):
@@ -77,7 +90,7 @@ class CountMinSketchRAM(JoinableRAM):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
 
-    def join(self, other: "CountMinSketchRAM"):
+    def join(self, other):
         self.bloom_filter.join(other.bloom_filter)
 
     def __contains__(self, key: BooleanArray):
@@ -89,13 +102,31 @@ class CountMinSketchRAM(JoinableRAM):
         return self.bloom_filter.check(key)
 
     def __str__(self) -> str:
-        return f"CountMinSketchRAM with {str(self.bloom_filter)}"
+        return f"{self.RAM_name} with {str(self.bloom_filter)}"
 
     def __repr__(self) -> str:
         return str(self)
 
     def size(self) -> int:
         return size_of_bloom(self.bloom_filter)
+    
+    def false_positive_rate(self) -> float:
+        return self.bloom_filter.error_rate
+
+
+class CountMinSketchRAM(_CMSRam):
+    RAM_cls = CountMinSketch
+    RAM_name = "CountMinSketchRAM"
+
+
+class CountMeanSketchRAM(_CMSRam):
+    RAM_cls = CountMeanSketch
+    RAM_name = "CountMeanSketchRAM"
+
+
+class CountMeanMinSketchRAM(_CMSRam):
+    RAM_cls = CountMeanMinSketch
+    RAM_name = "CountMeanMinSketchRAM"
 
 
 class CountingCuckooRAM(RAM):
@@ -139,11 +170,19 @@ class CountingCuckooRAM(RAM):
 
     def size(self) -> int:
         return size_of_bloom(self.bloom_filter)
+    
+    def false_positive_rate(self) -> float:
+        return self.bloom_filter.error_rate
 
 
 class HeavyHittersRAM(JoinableRAM):
     def __init__(
-        self, num_hitters=100, width=1000, depth=5, confidence=None, error_rate=None
+        self,
+        num_hitters=100,
+        width=1000,
+        depth=5,
+        confidence=None,
+        error_rate=None,
     ):
         # print("Builiding HeavyHittersRAM...")
         self.bloom_filter = HeavyHitters(
@@ -181,10 +220,17 @@ class HeavyHittersRAM(JoinableRAM):
     def size(self) -> int:
         return size_of_bloom(self.bloom_filter)
 
+    def false_positive_rate(self) -> float:
+        return self.bloom_filter.error_rate
 
 class StreamThresholdRAM(JoinableRAM):
     def __init__(
-        self, threshold=100, width=1000, depth=5, confidence=None, error_rate=None
+        self,
+        threshold=100,
+        width=1000,
+        depth=5,
+        confidence=None,
+        error_rate=None,
     ):
         # print("Builiding HeavyHittersRAM...")
         self.bloom_filter = StreamThreshold(
@@ -221,3 +267,6 @@ class StreamThresholdRAM(JoinableRAM):
 
     def size(self) -> int:
         return size_of_bloom(self.bloom_filter)
+    
+    def false_positive_rate(self) -> float:
+        return self.bloom_filter.error_rate

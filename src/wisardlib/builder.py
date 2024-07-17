@@ -10,6 +10,7 @@ def build_symmetric_wisard(
     RAM_creation_kwargs: dict = None,
     shuffle_indices: bool = True,
     count_responses: bool = True,
+    use_tqdm: bool = True,
 ):
     RAM_creation_kwargs = RAM_creation_kwargs or dict()
     discriminators = []
@@ -25,5 +26,6 @@ def build_symmetric_wisard(
         indices=indices,
         tuple_size=tuple_size,
         shuffle_indices=shuffle_indices,
+        use_tqdm=use_tqdm
     )
     return model

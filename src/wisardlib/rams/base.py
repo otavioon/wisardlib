@@ -3,15 +3,13 @@ from numba import jit
 from abc import abstractmethod
 
 from wisardlib.config.type_definitions import BooleanArray
+from numba import jit
+from numba import jit
+import numpy as np
 
-
-@jit(nopython=True, inline="always")
-def _encode_key(key: BooleanArray) -> str:
-    res = 0
-    for i in range(len(key)):
-        res += key[i] << i
-    return str(res)
-    # return str(sum(a<<i for i,a in enumerate(key)))
+@jit(nopython=True)
+def _encode_key(key: np.ndarray) -> str:
+    return ''.join(map(str, key))
 
 
 class RAM:
@@ -19,7 +17,7 @@ class RAM:
 
     def encode_key(self, key: BooleanArray):
         return _encode_key(key)
-
+    
         # res = sum(a<<i for i,a in enumerate(key))
         # return str(res)
 
@@ -39,6 +37,9 @@ class RAM:
 
     def size(self):
         raise NotImplementedError
+    
+    def false_positive_rate(self) -> float:
+        return 0
 
 
 class JoinableRAM(RAM):

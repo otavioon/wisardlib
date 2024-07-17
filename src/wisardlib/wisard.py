@@ -31,12 +31,13 @@ class Discriminator:
         self,
         rams: List[RAM],
         bleach: Real | List[Real] = 1,
-        count_responses: bool = True,
+        count_responses: bool = False,
     ):
         self._rams: List[RAM] = rams
         self._bleach = None
         self._count_responses = count_responses
         self.bleach = bleach
+        
 
     def fit(self, X: List[BooleanArray], y=None):
         """Fit model based on the input.
@@ -62,9 +63,11 @@ class Discriminator:
         # Do checking
         if len(X) != len(self._rams):
             raise ValueError("X must have same length as number of RAMs")
-        # Add member of each input to the respective RAM
+        
+        # Add members to the respective RAMs
         for ram, sample in zip(self._rams, X):
             ram.add_member(sample)
+        
         return self
 
     def predict(self, X: List[BooleanArray]) -> np.ndarray:
@@ -200,6 +203,9 @@ class Discriminator:
     def size(self) -> int:
         return sum(r.size() for r in self._rams)
 
+    def false_positive_rate(self) -> float:
+        return sum(r.false_positive_rate() for r in self._rams) / len(self._rams)
+
 
 class WiSARD:
     """Short summary.
@@ -265,7 +271,7 @@ class WiSARD:
     def _calculate_indices(
         indices, tuple_size: int | List[int] | List[slice]
     ) -> List[slice]:
-        """Calculate the slice of `indices` thatwill be use for input to be
+        """Calculate the slice of `indices` that will be use for input to be
         used in each RAM.
 
         Parameters
@@ -378,17 +384,18 @@ class WiSARD:
             The self object.
 
         """
-        it = range(len(X))
+        it = sorted(zip(X, y), key=lambda x: x[1]) 
+
         # If use tqdm, create an tqdm iterator at each sample
         if self.use_tqdm:
             it = tqdm.tqdm(
                 it, total=len(X), leave=True, position=0, desc="Fitting model..."
             )
         # Iterate over inputs
-        for i in it:
+        for _X, _y in it:
             # Transform each input as a list of subsamples (based on indices)
-            sample = self._reindex_sample(X[i])
-            self._discriminators[y[i]].fit(sample)
+            sample = self._reindex_sample(_X)
+            self._discriminators[_y].fit(sample)
         return self
 
     def predict(self, X: BooleanArray) -> np.ndarray:
@@ -439,3 +446,6 @@ class WiSARD:
 
     def size(self) -> int:
         return sum(d.size() for d in self._discriminators)
+
+    def mean_false_positive_rate(self) -> float:
+        return sum(d.false_positive_rate() for d in self._discriminators) / len(self._discriminators)
