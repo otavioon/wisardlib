@@ -54,9 +54,11 @@ class Discriminator:
         # Do checking
         if len(X) != len(self._rams):
             raise ValueError("X must have same length as number of RAMs")
-        # Add member of each input to the respective RAM
+        
+        # Add members to the respective RAMs
         for ram, sample in zip(self._rams, X):
             ram.add_member(sample)
+        
         return self
 
     def predict(self, X: List[Address]) -> List[int]:
@@ -132,6 +134,9 @@ class Discriminator:
             The size of the discriminator.
         """
         return sum(r.size() for r in self._rams)
+
+    def false_positive_rate(self) -> float:
+        return sum(r.false_positive_rate() for r in self._rams) / len(self._rams)
 
 
 class WiSARD:
@@ -227,12 +232,13 @@ class WiSARD:
             The self object.
 
         """
-        it = range(len(X))
+        it = sorted(zip(X, y), key=lambda x: x[1]) 
+
         # If use tqdm, create an tqdm iterator at each sample
         if self.use_tqdm:
             it = tqdm.tqdm(it, total=len(X), leave=True, position=0, desc="Fit")
         # Iterate over inputs
-        for i in it:
+        for _X, _y in it:
             # Transform each input as a list of subsamples (based on indices)
             addresses = self._addressify(X[i])
             self.discriminators[y[i]].fit(addresses)

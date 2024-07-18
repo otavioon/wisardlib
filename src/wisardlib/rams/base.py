@@ -37,6 +37,9 @@ class RAM:
 
     def size(self):
         raise NotImplementedError
+    
+    def false_positive_rate(self) -> float:
+        return 0
 
 
 class JoinableRAM(RAM):

@@ -1,4 +1,5 @@
 import logging
+import time
 
 import numpy as np
 import pandas as pd
@@ -6,36 +7,31 @@ import pandas as pd
 from wisardlib.config.type_definitions import ByteArray
 from wisardlib.encoders.base import Encoder
 
-# @jit(nopython=True, inline='always')
-def int_to_binary_list(value: int, size: int, reverse: bool = False):
-    if not reverse:
-        return [(value >> i) % 2 for i in range(size)]
-    else:
-        return [(value >> i) % 2 for i in range(size, 0, -1)]
-
-
 class ThermometerEncoder(Encoder):
     def __init__(self, resolution: int):
         self.resolution = resolution
         self.min_val = None
-        self.buckets = []
+        self.buckets = None
 
     def fit(self, X, y=None, **fit_args):
         self.min_val = np.min(X)
-        self.buckets = (
-            (np.arange(self.resolution) + 1)
-            * (np.max(X) - np.min(X))
-            / (self.resolution + 1)
-        )
+        max_val = np.max(X)
+        self.buckets = ((np.arange(self.resolution) + 1) * (max_val - self.min_val) / (self.resolution + 1))
         return self
 
     def transform(self, X: np.ndarray) -> ByteArray:
         new_shape = X.shape + (self.resolution,)
-        new_X = [
-            int_to_binary_list((1 << x + 1) - 1, self.resolution, reverse=True)
-            for x in np.digitize(X - self.min_val, self.buckets).ravel()
-        ]
-        return np.array(new_X, dtype=bool).reshape(new_shape)
+        digitized = np.digitize(X - self.min_val, self.buckets).ravel()
+        
+        # Calculate the binary representation in one step
+        new_X = (digitized[:, None] > np.arange(self.resolution)).astype(bool)
+        
+        # Reverse the values
+        new_X = new_X[:, ::-1]
+        
+        print(f"Time: {time.time() - start}")
+
+        return new_X.reshape(new_shape)
 
 
 class DistributiveThermometerEncoder(ThermometerEncoder):
