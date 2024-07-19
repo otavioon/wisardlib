@@ -28,8 +28,6 @@ class ThermometerEncoder(Encoder):
         
         # Reverse the values
         new_X = new_X[:, ::-1]
-        
-        print(f"Time: {time.time() - start}")
 
         return new_X.reshape(new_shape)
 

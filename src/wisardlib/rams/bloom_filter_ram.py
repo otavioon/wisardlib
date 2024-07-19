@@ -34,9 +34,6 @@ class CountingBloomFilterRAM(JoinableRAM):
             est_elements=est_elements, false_positive_rate=false_positive_rate
         )
 
-    # def encode_key(self, key: BooleanArray):
-    #     return str().join(str(k * 1) for k in key)
-
     def add_member(self, key: ByteArray, inc_val: int = 1):
         key = self.encode_key(key)
         self.bloom_filter.add(key)
